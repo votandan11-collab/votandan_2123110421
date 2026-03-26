@@ -14,5 +14,6 @@ namespace ASP.NET.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<PointsHistory> PointsHistories { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }
