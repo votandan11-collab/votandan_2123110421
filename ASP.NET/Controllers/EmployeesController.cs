@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Mvc;
-=======
-﻿using Microsoft.AspNetCore.Mvc;
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 using ASP.NET.Data;
 using ASP.NET.Models;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +50,6 @@ namespace ASP.NET.Controllers
             await _context.SaveChangesAsync();
             return Ok("Đã xóa nhân viên");
         }
-<<<<<<< HEAD
 
         // 🔐 5. ĐĂNG NHẬP
         [HttpPost("login")]
@@ -69,14 +64,14 @@ namespace ASP.NET.Controllers
             if (user == null)
                 return Unauthorized("Sai tài khoản hoặc mật khẩu");
 
-            // Trong thực hành thực tế nên trả về JWT Token
+            // Trả về thông tin user và token giả
             return Ok(new
             {
                 user.Id,
                 user.FullName,
                 user.Username,
                 user.Role,
-                Token = "fake-jwt-token-for-demo-" + user.Username // Placeholder
+                Token = "fake-jwt-token-for-demo-" + user.Username
             });
         }
     }
@@ -85,7 +80,5 @@ namespace ASP.NET.Controllers
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-=======
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
     }
 }

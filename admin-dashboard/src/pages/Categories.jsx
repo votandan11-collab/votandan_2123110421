@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { Tags, Plus, Search, Edit, Trash2, Folder, Layers } from 'lucide-react';
+import { Tags, Plus, Search, Edit2, Trash2, Folder, Layers } from 'lucide-react';
 import { categoryApi } from '../api';
 
 const Categories = () => {
@@ -32,8 +31,8 @@ const Categories = () => {
         <div className="animate-in">
             <div className="top-bar">
                 <div className="page-title">
-                    <h1>Product Categories</h1>
-                    <p>Organize your products into logical groups</p>
+                    <h1>Categories</h1>
+                    <p>Organize your cards and products</p>
                 </div>
                 <button className="btn btn-primary">
                     <Plus size={18} /> New Category
@@ -45,33 +44,21 @@ const Categories = () => {
                     <Search size={18} />
                     <input 
                         type="text" 
-                        placeholder="Filter categories..." 
+                        placeholder="Search categories..." 
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
             </div>
 
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-header">
-                        <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-                            <Layers size={20} />
-                        </div>
-                    </div>
-                    <div className="stat-value">{categories.length}</div>
-                    <div className="stat-label">Total Categories</div>
-                </div>
-            </div>
-
             <div className="table-container">
                 {loading ? (
-                    <div style={{ padding: '2rem', textAlign: 'center' }}>Loading categories...</div>
+                    <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
                 ) : (
                     <table>
                         <thead>
                             <tr>
-                                <th>Category Name</th>
+                                <th>Name</th>
                                 <th>Description</th>
                                 <th>Actions</th>
                             </tr>
@@ -81,118 +68,25 @@ const Categories = () => {
                                 <tr key={category.id}>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ padding: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
-                                                <Folder size={18} style={{ color: 'var(--primary)' }} />
-                                            </div>
+                                            <Folder size={18} style={{ color: 'var(--primary)' }} />
                                             <span style={{ fontWeight: 600 }}>{category.name}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                            {category.description || 'No description provided'}
-                                        </div>
-                                    </td>
+                                    <td style={{ color: 'var(--text-muted)' }}>{category.description || 'No description'}</td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn" style={{ padding: '6px', background: 'rgba(255,255,255,0.05)' }}>
-                                                <Edit size={14} />
-                                            </button>
-                                            <button className="btn" style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444' }}>
-                                                <Trash2 size={14} />
-                                            </button>
+                                            <button className="btn"><Edit2 size={14} /></button>
+                                            <button className="btn" style={{ color: '#ef4444' }}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
-                            {filteredCategories.length === 0 && (
-                                <tr>
-                                    <td colSpan="3" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                                        No categories found
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 )}
             </div>
         </div>
     );
-=======
-import { Tags, Plus, Search, Edit2, Trash2 } from 'lucide-react';
-import { categoryApi } from '../api';
-
-const Categories = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await categoryApi.getAll();
-      setCategories(response.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      // Fallback
-      setCategories([
-        { id: 1, name: 'Beverages', description: 'All types of drinks' },
-        { id: 2, name: 'Snacks', description: 'Light food items' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="animate-in">
-      <div className="top-bar">
-        <div className="page-title">
-          <h1>Categories</h1>
-          <p>Organize your products into logical groups.</p>
-        </div>
-        <button className="btn btn-primary">
-          <Plus size={18} /> Add New Category
-        </button>
-      </div>
-
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan="4" style={{ textAlign: 'center' }}>Loading...</td></tr>
-            ) : categories.map((cat) => (
-              <tr key={cat.id}>
-                <td>#{cat.id}</td>
-                <td style={{ fontWeight: 600 }}>{cat.name}</td>
-                <td style={{ color: 'var(--text-muted)' }}>{cat.description || 'No description'}</td>
-                <td>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn" style={{ padding: '6px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
-                      <Edit2 size={16} />
-                    </button>
-                    <button className="btn" style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)' }}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 };
 
 export default Categories;

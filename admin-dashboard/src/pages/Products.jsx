@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
 import { Package, Plus, Search, Edit2, Trash2, Tag, Archive, CheckCircle, XCircle } from 'lucide-react';
 import { productApi } from '../api';
 
@@ -26,7 +25,7 @@ const Products = () => {
 
     const filteredProducts = products.filter(p => 
         p.name.toLowerCase().includes(search.toLowerCase()) || 
-        p.category?.name?.toLowerCase().includes(search.toLowerCase())
+        (p.category?.name && p.category.name.toLowerCase().includes(search.toLowerCase()))
     );
 
     return (
@@ -46,7 +45,7 @@ const Products = () => {
                     <Search size={18} />
                     <input 
                         type="text" 
-                        placeholder="Search products or categories..." 
+                        placeholder="Search products..." 
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
@@ -61,7 +60,6 @@ const Products = () => {
                         <thead>
                             <tr>
                                 <th>Item Name</th>
-                                <th>Category</th>
                                 <th>Price</th>
                                 <th>Stock</th>
                                 <th>Status</th>
@@ -80,158 +78,30 @@ const Products = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
-                                            <Tag size={14} />
-                                            {product.category?.name || 'Uncategorized'}
-                                        </div>
-                                    </td>
-                                    <td>
                                         <div style={{ fontWeight: 700 }}>
                                             {product.price.toLocaleString()} VNĐ
                                         </div>
                                     </td>
+                                    <td>{product.stock} units</td>
                                     <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <Archive size={14} style={{ color: 'var(--text-muted)' }} />
-                                            <span style={{ color: product.stock < 10 ? '#ef4444' : 'inherit' }}>
-                                                {product.stock} units
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={`status-pills ${product.isActive ? 'status-active' : 'status-inactive'}`} 
-                                              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                            {product.isActive ? <CheckCircle size={10} /> : <XCircle size={10} />}
+                                        <span className={`status-pills ${product.isActive ? 'status-active' : 'status-inactive'}`}>
                                             {product.isActive ? 'Selling' : 'Hidden'}
                                         </span>
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn" style={{ padding: '6px', background: 'rgba(255,255,255,0.05)' }}>
-                                                <Edit2 size={14} />
-                                            </button>
-                                            <button className="btn" style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444' }}>
-                                                <Trash2 size={14} />
-                                            </button>
+                                            <button className="btn"><Edit2 size={14} /></button>
+                                            <button className="btn" style={{ color: '#ef4444' }}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
-                            {filteredProducts.length === 0 && (
-                                <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No products found</td></tr>
-                            )}
                         </tbody>
                     </table>
                 )}
             </div>
         </div>
     );
-=======
-import { Package, Plus, Search, Edit2, Trash2, MoreHorizontal } from 'lucide-react';
-import { productApi } from '../api';
-
-const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await productApi.getAll();
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      // Fallback dummy data for demo if API is not running
-      setProducts([
-        { id: 1, name: 'Premium Coffee Bean', price: 15.00, stock: 100, category: 'Beans', isActive: true },
-        { id: 2, name: 'Espresso Machine', price: 450.00, stock: 15, category: 'Equipment', isActive: true },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(search.toLowerCase()) || 
-    p.category?.name?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="animate-in">
-      <div className="top-bar">
-        <div className="page-title">
-          <h1>Products</h1>
-          <p>Manage your product inventory and pricing.</p>
-        </div>
-        <button className="btn btn-primary">
-          <Plus size={18} /> Add New Product
-        </button>
-      </div>
-
-      <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input 
-            type="text" 
-            placeholder="Search products..." 
-            className="input-field" 
-            style={{ paddingLeft: '40px' }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan="7" style={{ textAlign: 'center' }}>Loading...</td></tr>
-            ) : filteredProducts.map((product) => (
-              <tr key={product.id}>
-                <td>#{product.id}</td>
-                <td style={{ fontWeight: 600 }}>{product.name}</td>
-                <td>{product.category?.name || 'N/A'}</td>
-                <td>${product.price.toFixed(2)}</td>
-                <td>{product.stock}</td>
-                <td>
-                  <span className={`status-pills ${product.isActive ? 'status-active' : 'status-inactive'}`}>
-                    {product.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button className="btn" style={{ padding: '6px', background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
-                      <Edit2 size={16} />
-                    </button>
-                    <button className="btn" style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)' }}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 };
 
 export default Products;

@@ -82,6 +82,8 @@ body {
 .nav-links {
   padding: 1rem 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav-item {
@@ -271,7 +273,6 @@ tr:hover td {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
-<<<<<<< HEAD
 .search-box {
   position: relative;
   display: flex;
@@ -325,8 +326,6 @@ tr:hover td {
   background: #334155;
 }
 
-=======
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 /* Glass Modal */
 .modal-overlay {
   position: fixed;

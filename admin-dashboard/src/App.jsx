@@ -1,14 +1,9 @@
 import React from 'react';
-<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-=======
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
-<<<<<<< HEAD
 import Customers from './pages/Customers';
 import Orders from './pages/Orders';
 import Rewards from './pages/Rewards';
@@ -20,6 +15,8 @@ import './index.css';
 
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import UserAuth from './pages/UserAuth';
+import { productApi } from './api';
 
 // Admin Layout Component
 const AdminLayout = ({ children }) => (
@@ -31,17 +28,13 @@ const AdminLayout = ({ children }) => (
   </div>
 );
 
-import { productApi } from './api';
-import UserAuth from './pages/UserAuth';
-
-// A more functional Customer View for testing
+// Giao diện Khách hàng (User Interface)
 const CustomerHome = () => {
   const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
-    // Check if user is logged in
     const savedUser = localStorage.getItem('userData');
     if (savedUser) setUser(JSON.parse(savedUser));
 
@@ -121,12 +114,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
+        {/* Route Công khai */}
         <Route path="/" element={<CustomerHome />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/user-auth" element={<UserAuth />} />
 
-        {/* Protected Admin Routes */}
+        {/* Route Quản trị (Admin) - Được bảo vệ */}
         <Route path="/admin" element={<ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><AdminLayout><Products /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/categories" element={<ProtectedRoute><AdminLayout><Categories /></AdminLayout></ProtectedRoute>} />
@@ -138,29 +131,9 @@ function App() {
         <Route path="/admin/payments" element={<ProtectedRoute><AdminLayout><Payments /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/points-history" element={<ProtectedRoute><AdminLayout><PointsHistory /></AdminLayout></ProtectedRoute>} />
         
-        {/* Fallback */}
+        {/* Chuyển hướng nếu không khớp */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-=======
-import './index.css';
-
-function App() {
-  return (
-    <Router>
-      <Sidebar />
-      <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/orders" element={<div className="animate-in"><h1>Orders (Coming Soon)</h1></div>} />
-          <Route path="/customers" element={<div className="animate-in"><h1>Customers (Coming Soon)</h1></div>} />
-          <Route path="/stores" element={<div className="animate-in"><h1>Stores (Coming Soon)</h1></div>} />
-          <Route path="/rewards" element={<div className="animate-in"><h1>Rewards (Coming Soon)</h1></div>} />
-          <Route path="/payments" element={<div className="animate-in"><h1>Payments (Coming Soon)</h1></div>} />
-        </Routes>
-      </main>
->>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
     </Router>
   );
 }
