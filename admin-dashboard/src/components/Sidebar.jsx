@@ -1,5 +1,9 @@
 import React from 'react';
+<<<<<<< HEAD
 import { NavLink, useNavigate } from 'react-router-dom';
+=======
+import { NavLink } from 'react-router-dom';
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 import { 
   LayoutDashboard, 
   Package, 
@@ -8,6 +12,7 @@ import {
   Users, 
   Store, 
   Gift, 
+<<<<<<< HEAD
   History,
   ShieldCheck,
   LogOut,
@@ -42,6 +47,30 @@ const Sidebar = () => {
           <ShieldCheck size={24} />
         </div>
         <span className="logo-text">LOYALTY ADMIN</span>
+=======
+  CreditCard 
+} from 'lucide-react';
+
+const Sidebar = () => {
+  const navItems = [
+    { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
+    { name: 'Products', path: '/products', icon: <Package size={20} /> },
+    { name: 'Categories', path: '/categories', icon: <Tags size={20} /> },
+    { name: 'Orders', path: '/orders', icon: <ShoppingCart size={20} /> },
+    { name: 'Customers', path: '/customers', icon: <Users size={20} /> },
+    { name: 'Stores', path: '/stores', icon: <Store size={20} /> },
+    { name: 'Rewards', path: '/rewards', icon: <Gift size={20} /> },
+    { name: 'Payments', path: '/payments', icon: <CreditCard size={20} /> },
+  ];
+
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <div className="logo-icon">
+          <Store size={24} />
+        </div>
+        <span className="logo-text">ADMIN PANEL</span>
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
       </div>
       <nav className="nav-links">
         {navItems.map((item) => (
@@ -54,6 +83,7 @@ const Sidebar = () => {
             <span>{item.name}</span>
           </NavLink>
         ))}
+<<<<<<< HEAD
         <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
           <NavLink to="/" className="nav-item">
             <Store size={20} />
@@ -64,6 +94,8 @@ const Sidebar = () => {
             <span>Logout</span>
           </button>
         </div>
+=======
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
       </nav>
     </aside>
   );

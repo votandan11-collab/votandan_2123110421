@@ -1,9 +1,14 @@
 import React from 'react';
+<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+=======
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
+<<<<<<< HEAD
 import Customers from './pages/Customers';
 import Orders from './pages/Orders';
 import Rewards from './pages/Rewards';
@@ -136,6 +141,26 @@ function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+=======
+import './index.css';
+
+function App() {
+  return (
+    <Router>
+      <Sidebar />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/orders" element={<div className="animate-in"><h1>Orders (Coming Soon)</h1></div>} />
+          <Route path="/customers" element={<div className="animate-in"><h1>Customers (Coming Soon)</h1></div>} />
+          <Route path="/stores" element={<div className="animate-in"><h1>Stores (Coming Soon)</h1></div>} />
+          <Route path="/rewards" element={<div className="animate-in"><h1>Rewards (Coming Soon)</h1></div>} />
+          <Route path="/payments" element={<div className="animate-in"><h1>Payments (Coming Soon)</h1></div>} />
+        </Routes>
+      </main>
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
     </Router>
   );
 }

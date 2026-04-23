@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Mvc;
+=======
+﻿using Microsoft.AspNetCore.Mvc;
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 using ASP.NET.Data;
 using ASP.NET.Models;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +54,7 @@ namespace ASP.NET.Controllers
             await _context.SaveChangesAsync();
             return Ok("Đã xóa nhân viên");
         }
+<<<<<<< HEAD
 
         // 🔐 5. ĐĂNG NHẬP
         [HttpPost("login")]
@@ -80,5 +85,7 @@ namespace ASP.NET.Controllers
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+=======
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
     }
 }

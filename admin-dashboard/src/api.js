@@ -1,6 +1,10 @@
 import axios from 'axios';
 
+<<<<<<< HEAD
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+=======
+const API_BASE_URL = 'http://localhost:5000/api'; // This will be replaced by Render URL later
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -23,6 +27,7 @@ export const categoryApi = {
   delete: (id) => api.delete(`/categories/${id}`),
 };
 
+<<<<<<< HEAD
 export const customerApi = {
   getAll: () => api.get('/Customers'),
   getById: (id) => api.get(`/Customers/${id}`),
@@ -75,5 +80,8 @@ export const paymentApi = {
   update: (id, data) => api.put(`/Payment/${id}`, data),
   delete: (id) => api.delete(`/Payment/${id}`),
 };
+=======
+// Add more API calls as needed for other entities
+>>>>>>> 9af0e322905d21eae0f46bf213a1507619559811
 
 export default api;
