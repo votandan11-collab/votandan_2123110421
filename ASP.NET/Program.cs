@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // 🔥 Tự động chuyển đổi URL của Render sang định dạng C# hiểu được 🔥
-if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+if (!string.IsNullOrEmpty(connectionString) && (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
 {
     var databaseUri = new Uri(connectionString);
     var userInfo = databaseUri.UserInfo.Split(':');
@@ -30,6 +30,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseDeveloperExceptionPage();
 
 // 🔥 TỰ ĐỘNG MIGRATION KHI STARTUP 🔥
 using (var scope = app.Services.CreateScope())
