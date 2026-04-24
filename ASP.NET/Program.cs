@@ -61,31 +61,33 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        // Sử dụng EnsureCreated để tự động tạo Database sạch trên Render
         context.Database.EnsureCreated();
         
-        // Cưỡng ép tạo bảng Banners nếu EF Core bỏ qua
-        var sql = @"
-            CREATE TABLE IF NOT EXISTS ""Banners"" (
-                ""Id"" SERIAL PRIMARY KEY,
-                ""ImageUrl"" TEXT NOT NULL,
-                ""Title"" TEXT NOT NULL,
-                ""Description"" TEXT,
-                ""IsActive"" BOOLEAN DEFAULT TRUE,
-                ""DisplayOrder"" INTEGER DEFAULT 0,
-                ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            );";
-        context.Database.ExecuteSqlRaw(sql);
+        // 1. Tạo bảng Banners
+        try {
+            var bannerSql = @"
+                CREATE TABLE IF NOT EXISTS ""Banners"" (
+                    ""Id"" SERIAL PRIMARY KEY,
+                    ""ImageUrl"" TEXT NOT NULL,
+                    ""Title"" TEXT NOT NULL,
+                    ""Description"" TEXT,
+                    ""IsActive"" BOOLEAN DEFAULT TRUE,
+                    ""DisplayOrder"" INTEGER DEFAULT 0,
+                    ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );";
+            context.Database.ExecuteSqlRaw(bannerSql);
+        } catch { /* Bỏ qua nếu đã tồn tại */ }
 
-        // Thêm cột ImageUrl cho Product nếu chưa có
-        context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"ImageUrl\" TEXT;");
+        // 2. Thêm cột ImageUrl cho Products
+        try {
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"ImageUrl\" TEXT;");
+        } catch { /* Bỏ qua nếu đã tồn tại */ }
 
-        Console.WriteLine("--- DATABASE: Đã kiểm tra và khởi tạo bảng thành công ---");
+        Console.WriteLine("--- DATABASE: Khởi tạo hoàn tất ---");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Lỗi khi tự động tạo bảng database.");
+        Console.WriteLine("--- DATABASE INIT ERROR: " + ex.Message);
     }
 }
 

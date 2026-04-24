@@ -13,8 +13,8 @@ const Products = () => {
     const [editingId, setEditingId] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
-        price: 0,
-        stock: 0,
+        price: '',
+        stock: '',
         categoryId: '',
         imageUrl: '',
         isActive: true
@@ -46,8 +46,8 @@ const Products = () => {
             const payload = { 
                 ...formData, 
                 categoryId: parseInt(formData.categoryId),
-                price: parseFloat(formData.price),
-                stock: parseInt(formData.stock)
+                price: parseFloat(formData.price || 0),
+                stock: parseInt(formData.stock || 0)
             };
             if (editingId) {
                 await productApi.update(editingId, { ...payload, id: editingId });
@@ -56,7 +56,7 @@ const Products = () => {
             }
             setShowForm(false);
             setEditingId(null);
-            setFormData({ name: '', price: 0, stock: 0, categoryId: '', imageUrl: '', isActive: true });
+            setFormData({ name: '', price: '', stock: '', categoryId: '', imageUrl: '', isActive: true });
             fetchData();
         } catch (error) {
             alert('Lỗi khi lưu sản phẩm. Vui lòng kiểm tra lại dữ liệu.');
@@ -78,9 +78,9 @@ const Products = () => {
         setEditingId(p.id);
         setFormData({
             name: p.name,
-            price: p.price,
-            stock: p.stock,
-            categoryId: p.categoryId,
+            price: p.price.toString(),
+            stock: p.stock.toString(),
+            categoryId: p.categoryId.toString(),
             imageUrl: p.imageUrl || '',
             isActive: p.isActive
         });
@@ -88,7 +88,7 @@ const Products = () => {
     };
 
     const filteredProducts = products.filter(p => 
-        p.name.toLowerCase().includes(search.toLowerCase())
+        (p.name || '').toLowerCase().includes(search.toLowerCase())
     );
 
     return (
@@ -177,7 +177,7 @@ const Products = () => {
                                         </div>
                                     </td>
                                     <td><span style={{ fontWeight: 600 }}>{p.name}</span></td>
-                                    <td><strong>{p.price.toLocaleString()}</strong> VNĐ</td>
+                                    <td><strong>{(p.price || 0).toLocaleString()}</strong> VNĐ</td>
                                     <td>{p.stock}</td>
                                     <td>
                                         <span className={`status-pills ${p.isActive ? 'status-active' : 'status-inactive'}`}>
