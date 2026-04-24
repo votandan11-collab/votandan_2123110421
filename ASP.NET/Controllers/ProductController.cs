@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ASP.NET.Data;
 using ASP.NET.Models;
 using System;
@@ -17,52 +17,56 @@ namespace ASP.NET.Controllers
             _context = context;
         }
 
-        // 🔍 LẤY TẤT CẢ (Ưu tiên món đang bán lên trước)
+        // 🔍 LẤY TẤT CẢ
         [HttpGet]
         public IActionResult GetAll()
         {
             var products = _context.Products
                 .OrderByDescending(p => p.IsActive)
-                .ThenBy(p => p.Category)
                 .ToList();
             return Ok(products);
         }
 
         // ➕ THÊM MỚI SẢN PHẨM
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create([FromBody] Product product)
         {
-            product.CreatedAt = DateTime.Now;
-            _context.Products.Add(product);
-            _context.SaveChanges();
-            return Ok(product);
+            try {
+                product.CreatedAt = DateTime.Now;
+                _context.Products.Add(product);
+                _context.SaveChanges();
+                return Ok(product);
+            } catch (Exception ex) {
+                return StatusCode(500, $"Lỗi Database: {ex.Message}");
+            }
         }
 
-        // ✏️ CẬP NHẬT (Có nghiệp vụ lưu vết người sửa)
+        // ✏️ CẬP NHẬT
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Product p, [FromQuery] string adminName)
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound("Không tìm thấy sản phẩm");
 
-            // Cập nhật thông tin
+            // Cập nhật thông tin cơ bản
             product.Name = p.Name;
             product.Price = p.Price;
             product.Stock = p.Stock;
-            product.Category = p.Category;
+            product.CategoryId = p.CategoryId; // Cập nhật qua ID thay vì Object
+            product.ImageUrl = p.ImageUrl;
+            product.DiscountRate = p.DiscountRate;
             product.IsActive = p.IsActive;
 
-            // NGHIỆP VỤ: Lưu vết ai sửa giá hoặc kho
+            // Lưu vết
             product.UpdatedAt = DateTime.Now;
-            product.UpdatedBy = string.IsNullOrEmpty(adminName) ? "Admin_Kho" : adminName;
+            product.UpdatedBy = string.IsNullOrEmpty(adminName) ? "Admin" : adminName;
 
-            _context.SaveChanges();
-            return Ok(new
-            {
-                Message = "Cập nhật sản phẩm thành công",
-                UpdatedBy = product.UpdatedBy,
-                Time = product.UpdatedAt
-            });
+            try {
+                _context.SaveChanges();
+                return Ok(new { Message = "Cập nhật thành công", Product = product });
+            } catch (Exception ex) {
+                return StatusCode(500, $"Lỗi lưu dữ liệu: {ex.Message}");
+            }
         }
 
         // ❌ XÓA SẢN PHẨM
@@ -72,9 +76,13 @@ namespace ASP.NET.Controllers
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
-            return Ok("Xóa thành công");
+            try {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+                return Ok("Xóa thành công");
+            } catch (Exception ex) {
+                return StatusCode(500, $"Không thể xóa: {ex.Message}");
+            }
         }
     }
 }

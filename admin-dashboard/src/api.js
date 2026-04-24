@@ -10,17 +10,17 @@ const api = axios.create({
 });
 
 export const productApi = {
-  getAll: () => api.get('/product'),
-  create: (data) => api.post('/product', data),
-  update: (id, data, adminName) => api.put(`/product/${id}?adminName=${adminName}`, data),
-  delete: (id) => api.delete(`/product/${id}`),
+  getAll: () => api.get('/Product'),
+  create: (data) => api.post('/Product', data),
+  update: (id, data, adminName) => api.put(`/Product/${id}?adminName=${adminName}`, data),
+  delete: (id) => api.delete(`/Product/${id}`),
 };
 
 export const categoryApi = {
-  getAll: () => api.get('/categories'),
-  create: (data) => api.post('/categories', data),
-  update: (id, data) => api.put(`/categories/${id}`, data),
-  delete: (id) => api.delete(`/categories/${id}`),
+  getAll: () => api.get('/Categories'),
+  create: (data) => api.post('/Categories', data),
+  update: (id, data) => api.put(`/Categories/${id}`, data),
+  delete: (id) => api.delete(`/Categories/${id}`),
 };
 
 export const customerApi = {
