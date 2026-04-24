@@ -11,7 +11,8 @@ import {
   History,
   ShieldCheck,
   LogOut,
-  CreditCard
+  CreditCard,
+  Image as ImageIcon
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -20,6 +21,7 @@ const Sidebar = () => {
     { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard size={20} /> },
     { name: 'Products', path: '/admin/products', icon: <Package size={20} /> },
     { name: 'Categories', path: '/admin/categories', icon: <Tags size={20} /> },
+    { name: 'Banners', path: '/admin/banners', icon: <ImageIcon size={20} /> },
     { name: 'Orders', path: '/admin/orders', icon: <ShoppingCart size={20} /> },
     { name: 'Customers', path: '/admin/customers', icon: <Users size={20} /> },
     { name: 'Rewards', path: '/admin/rewards', icon: <Gift size={20} /> },

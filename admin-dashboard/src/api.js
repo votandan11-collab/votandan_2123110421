@@ -76,4 +76,13 @@ export const paymentApi = {
   delete: (id) => api.delete(`/Payment/${id}`),
 };
 
+// Banner API
+export const bannerApi = {
+    getAll: () => api.get(`/Banners`),
+    getAdmin: () => api.get(`/Banners/admin`),
+    create: (data) => api.post(`/Banners`, data),
+    update: (id, data) => api.put(`/Banners/${id}`, data),
+    delete: (id) => api.delete(`/Banners/${id}`)
+};
+
 export default api;

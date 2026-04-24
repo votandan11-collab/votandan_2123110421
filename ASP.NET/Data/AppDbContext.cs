@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ASP.NET.Models;
 
 namespace ASP.NET.Data
@@ -20,5 +20,6 @@ namespace ASP.NET.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Banner> Banners { get; set; }
     }
 }

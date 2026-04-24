@@ -4,21 +4,40 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Thử lấy link từ DefaultConnection hoặc DATABASE_URL (Render mặc định)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+                    ?? builder.Configuration["DATABASE_URL"];
 
-// 🔥 Tự động chuyển đổi URL của Render sang định dạng C# hiểu được 🔥
-if (!string.IsNullOrEmpty(connectionString) && (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://")))
+if (!string.IsNullOrEmpty(connectionString))
 {
-    var databaseUri = new Uri(connectionString);
-    var userInfo = databaseUri.UserInfo.Split(':');
-    var host = databaseUri.Host;
-    var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
-    var database = databaseUri.AbsolutePath.TrimStart('/');
-    connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    connectionString = connectionString.Trim();
+    if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
+    {
+        try {
+            var databaseUri = new Uri(connectionString);
+            var userInfo = databaseUri.UserInfo.Split(':');
+            var host = databaseUri.Host;
+            var port = databaseUri.Port > 0 ? databaseUri.Port : 5432;
+            var database = databaseUri.AbsolutePath.TrimStart('/');
+            connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+        } catch (Exception ex) {
+            Console.WriteLine("LỖI PARSE URL: " + ex.Message);
+        }
+    }
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString ?? ""));
+
+// Debug an toàn
+if (!string.IsNullOrEmpty(connectionString)) {
+    try {
+        var builderDb = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
+        Console.WriteLine($"--- DATABASE DEBUG --- Host: {builderDb.Host} | DB: {builderDb.Database}");
+    } catch { 
+        Console.WriteLine("--- DATABASE DEBUG --- Chuỗi kết nối không đúng định dạng key-value.");
+    }
+}
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -27,9 +46,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
 var app = builder.Build();

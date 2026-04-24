@@ -18,11 +18,11 @@ const LoginPage = () => {
         try {
             const response = await employeeApi.login({ username, password });
             const { token, fullName, role } = response.data;
-            
+
             // Save to local storage
             localStorage.setItem('adminToken', token);
             localStorage.setItem('adminUser', JSON.stringify({ fullName, role }));
-            
+
             navigate('/admin');
         } catch (err) {
             setError(err.response?.data || 'Login failed. Please check your credentials.');
@@ -51,7 +51,7 @@ const LoginPage = () => {
                 boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
             }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{ 
+                    <div style={{
                         background: 'linear-gradient(135deg, var(--primary) 0%, #a855f7 100%)',
                         width: '60px',
                         height: '60px',
@@ -74,10 +74,10 @@ const LoginPage = () => {
                 <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div style={{ position: 'relative' }}>
                         <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input 
-                            type="text" 
-                            placeholder="Username" 
-                            className="input-field" 
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            className="input-field"
                             style={{ paddingLeft: '40px' }}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -86,10 +86,10 @@ const LoginPage = () => {
                     </div>
                     <div style={{ position: 'relative' }}>
                         <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input 
-                            type="password" 
-                            placeholder="Password" 
-                            className="input-field" 
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            className="input-field"
                             style={{ paddingLeft: '40px' }}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -103,9 +103,9 @@ const LoginPage = () => {
                         </div>
                     )}
 
-                    <button 
-                        type="submit" 
-                        className="btn btn-primary" 
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
                         style={{ width: '100%', justifyContent: 'center', height: '45px', marginTop: '0.5rem' }}
                         disabled={loading}
                     >
@@ -115,18 +115,19 @@ const LoginPage = () => {
                             </>
                         )}
                     </button>
-                    
+
                     <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        <a href="/" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none', transition: 'var(--transition)' }} 
-                           onMouseOver={(e) => e.target.style.color = 'white'}
-                           onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}>
+                        <a href="/" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none', transition: 'var(--transition)' }}
+                            onMouseOver={(e) => e.target.style.color = 'white'}
+                            onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}>
                             ← Back to Customer Site
                         </a>
                     </div>
                 </form>
             </div>
-            
-            <style dangerouslySetInnerHTML={{ __html: `
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes spin {
                     from { transform: rotate(0deg); }
                     to { transform: rotate(360deg); }
