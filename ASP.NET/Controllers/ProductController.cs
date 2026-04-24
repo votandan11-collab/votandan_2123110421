@@ -32,12 +32,13 @@ namespace ASP.NET.Controllers
         public IActionResult Create([FromBody] Product product)
         {
             try {
-                product.CreatedAt = DateTime.Now;
+                product.CreatedAt = DateTime.UtcNow;
                 _context.Products.Add(product);
                 _context.SaveChanges();
                 return Ok(product);
             } catch (Exception ex) {
-                return StatusCode(500, $"Lỗi Database: {ex.Message}");
+                // Trả về lỗi chi tiết để debug
+                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
             }
         }
 
@@ -48,24 +49,22 @@ namespace ASP.NET.Controllers
             var product = _context.Products.Find(id);
             if (product == null) return NotFound("Không tìm thấy sản phẩm");
 
-            // Cập nhật thông tin cơ bản
             product.Name = p.Name;
             product.Price = p.Price;
             product.Stock = p.Stock;
-            product.CategoryId = p.CategoryId; // Cập nhật qua ID thay vì Object
+            product.CategoryId = p.CategoryId;
             product.ImageUrl = p.ImageUrl;
             product.DiscountRate = p.DiscountRate;
             product.IsActive = p.IsActive;
 
-            // Lưu vết
-            product.UpdatedAt = DateTime.Now;
+            product.UpdatedAt = DateTime.UtcNow;
             product.UpdatedBy = string.IsNullOrEmpty(adminName) ? "Admin" : adminName;
 
             try {
                 _context.SaveChanges();
                 return Ok(new { Message = "Cập nhật thành công", Product = product });
             } catch (Exception ex) {
-                return StatusCode(500, $"Lỗi lưu dữ liệu: {ex.Message}");
+                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
             }
         }
 

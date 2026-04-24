@@ -20,7 +20,7 @@ namespace ASP.NET.Models
         // ------------------------------------------
         public bool IsActive { get; set; } = true; // True: Đang bán, False: Ngừng bán
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
     }
