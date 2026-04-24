@@ -77,6 +77,9 @@ using (var scope = app.Services.CreateScope())
             );";
         context.Database.ExecuteSqlRaw(sql);
 
+        // Thêm cột ImageUrl cho Product nếu chưa có
+        context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"ImageUrl\" TEXT;");
+
         Console.WriteLine("--- DATABASE: Đã kiểm tra và khởi tạo bảng thành công ---");
     }
     catch (Exception ex)

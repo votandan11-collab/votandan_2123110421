@@ -15,18 +15,27 @@ const CustomerHome = () => {
     const savedUser = localStorage.getItem('userData');
     if (savedUser) setUser(JSON.parse(savedUser));
 
+    // Lấy Category từ URL
+    const params = new URLSearchParams(window.location.search);
+    const categoryId = params.get('category');
+
     // Fetch Products
-    productApi.getAll().then(res => setProducts(res.data)).catch(console.error);
+    productApi.getAll().then(res => {
+        let data = res.data;
+        if (categoryId) {
+            data = data.filter(p => p.categoryId === parseInt(categoryId));
+        }
+        setProducts(data);
+    }).catch(console.error);
 
     // Fetch Banners
     bannerApi.getAll().then(res => {
         setBanners(res.data);
         setLoading(false);
-    }).catch((err) => {
-        console.error('Error fetching banners:', err);
+    }).catch(() => {
         setLoading(false);
     });
-  }, []);
+  }, [window.location.search]); // Chạy lại khi URL thay đổi
 
   useEffect(() => {
     if (banners.length > 0) {

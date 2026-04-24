@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Tags, Plus, Search, Edit2, Trash2, Folder, Layers } from 'lucide-react';
+import { Tags, Plus, Search, Edit2, Trash2, Save, X, Folder } from 'lucide-react';
 import { categoryApi } from '../api';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
+    
+    // Form State
+    const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: ''
+    });
 
     useEffect(() => {
         fetchCategories();
@@ -23,6 +31,43 @@ const Categories = () => {
         }
     };
 
+    const handleSave = async (e) => {
+        e.preventDefault();
+        try {
+            if (editingId) {
+                await categoryApi.update(editingId, { ...formData, id: editingId });
+            } else {
+                await categoryApi.create(formData);
+            }
+            setShowForm(false);
+            setEditingId(null);
+            setFormData({ name: '', description: '' });
+            fetchCategories();
+        } catch (error) {
+            alert('Lỗi khi lưu danh mục. Vui lòng thử lại.');
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Xác nhận xóa danh mục này? Lưu ý: Nếu có sản phẩm trong danh mục này, bạn không thể xóa.')) {
+            try {
+                await categoryApi.delete(id);
+                fetchCategories();
+            } catch (error) {
+                alert('Không thể xóa danh mục này. Hãy đảm bảo danh mục đang trống (không có sản phẩm nào thuộc danh mục này).');
+            }
+        }
+    };
+
+    const startEdit = (c) => {
+        setEditingId(c.id);
+        setFormData({
+            name: c.name,
+            description: c.description || ''
+        });
+        setShowForm(true);
+    };
+
     const filteredCategories = categories.filter(c => 
         c.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -31,52 +76,66 @@ const Categories = () => {
         <div className="animate-in">
             <div className="top-bar">
                 <div className="page-title">
-                    <h1>Categories</h1>
-                    <p>Organize your cards and products</p>
+                    <h1>Quản lý Danh mục & Nhà mạng</h1>
+                    <p>Phân loại các loại thẻ cào và sản phẩm khác</p>
                 </div>
-                <button className="btn btn-primary">
-                    <Plus size={18} /> New Category
+                <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setEditingId(null); }}>
+                    {showForm ? <X size={18} /> : <Plus size={18} />}
+                    {showForm ? ' Hủy' : ' Thêm danh mục'}
                 </button>
             </div>
 
-            <div style={{ marginBottom: '2rem', maxWidth: '400px' }}>
-                <div className="search-box">
-                    <Search size={18} />
-                    <input 
-                        type="text" 
-                        placeholder="Search categories..." 
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+            {showForm && (
+                <div style={{ background: 'var(--card-bg)', padding: '2rem', borderRadius: '1rem', border: '1px solid var(--border)', marginBottom: '2rem' }}>
+                    <form onSubmit={handleSave} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        <div>
+                            <label className="input-label">Tên danh mục (Vd: Viettel, Mobifone...)</label>
+                            <input type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+                        </div>
+                        <div>
+                            <label className="input-label">Mô tả ngắn</label>
+                            <input type="text" className="input-field" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                        </div>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                                <Save size={18} /> {editingId ? 'Cập nhật danh mục' : 'Lưu danh mục mới'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            )}
+
+            <div className="search-box" style={{ marginBottom: '2rem', maxWidth: '400px' }}>
+                <Search size={18} />
+                <input type="text" placeholder="Tìm kiếm danh mục..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
             <div className="table-container">
-                {loading ? (
-                    <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
-                ) : (
+                {loading ? <p style={{ padding: '2rem', textAlign: 'center' }}>Đang tải...</p> : (
                     <table>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Actions</th>
+                                <th>Tên danh mục</th>
+                                <th>Mô tả</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredCategories.map((category) => (
-                                <tr key={category.id}>
+                            {filteredCategories.map((c) => (
+                                <tr key={c.id}>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <Folder size={18} style={{ color: 'var(--primary)' }} />
-                                            <span style={{ fontWeight: 600 }}>{category.name}</span>
+                                            <div style={{ padding: '8px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '10px' }}>
+                                                <Folder size={18} color="#6366f1" />
+                                            </div>
+                                            <span style={{ fontWeight: 600 }}>{c.name}</span>
                                         </div>
                                     </td>
-                                    <td style={{ color: 'var(--text-muted)' }}>{category.description || 'No description'}</td>
+                                    <td style={{ color: 'var(--text-muted)' }}>{c.description || 'Không có mô tả'}</td>
                                     <td>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn"><Edit2 size={14} /></button>
-                                            <button className="btn" style={{ color: '#ef4444' }}><Trash2 size={14} /></button>
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            <button onClick={() => startEdit(c)} className="btn" style={{ background: 'rgba(255,255,255,0.05)' }}><Edit2 size={14} /></button>
+                                            <button onClick={() => handleDelete(c.id)} className="btn" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>

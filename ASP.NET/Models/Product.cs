@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ASP.NET.Models
@@ -9,6 +9,7 @@ namespace ASP.NET.Models
         public string Name { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
+        public string? ImageUrl { get; set; }
 
         // --- PHẦN THAY ĐỔI ĐỂ LIÊN KẾT CATEGORY ---
         public int CategoryId { get; set; }
