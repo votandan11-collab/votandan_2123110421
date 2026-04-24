@@ -63,6 +63,21 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<AppDbContext>();
         // Sử dụng EnsureCreated để tự động tạo Database sạch trên Render
         context.Database.EnsureCreated();
+        
+        // Cưỡng ép tạo bảng Banners nếu EF Core bỏ qua
+        var sql = @"
+            CREATE TABLE IF NOT EXISTS ""Banners"" (
+                ""Id"" SERIAL PRIMARY KEY,
+                ""ImageUrl"" TEXT NOT NULL,
+                ""Title"" TEXT NOT NULL,
+                ""Description"" TEXT,
+                ""IsActive"" BOOLEAN DEFAULT TRUE,
+                ""DisplayOrder"" INTEGER DEFAULT 0,
+                ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );";
+        context.Database.ExecuteSqlRaw(sql);
+
+        Console.WriteLine("--- DATABASE: Đã kiểm tra và khởi tạo bảng thành công ---");
     }
     catch (Exception ex)
     {
