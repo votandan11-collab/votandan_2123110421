@@ -5,16 +5,26 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Customers from './pages/Customers';
-import UserManagement from './pages/UserManagement';
-import Settings from './pages/Settings';
+import UserAuth from './pages/UserAuth'; 
 import CustomerHome from './pages/CustomerHome';
 import ProductDetail from './pages/ProductDetail'; 
-import AdminLayout from './components/AdminLayout';
+import Sidebar from './components/Sidebar';
 
-// Giả lập check login (Bạn có thể thay bằng logic thật)
+// Giao diện Layout dành riêng cho Admin
+const AdminLayout = ({ children }) => (
+  <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-main)' }}>
+    <Sidebar />
+    <div style={{ flex: 1, padding: '2rem', height: '100vh', overflowY: 'auto' }}>
+      {children}
+    </div>
+  </div>
+);
+
+// Bảo vệ đường dẫn Admin
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('employeeToken');
-  if (!token) return <Navigate to="/login" />;
+  // Tùy theo logic auth hiện tại của bạn
+  const token = localStorage.getItem('adminToken') || localStorage.getItem('employeeToken');
+  if (!token) return <Navigate to="/login" replace />;
   return <AdminLayout>{children}</AdminLayout>;
 };
 
@@ -22,20 +32,19 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* PUBLIC ROUTES (CUSTOMER PORTAL) */}
+        {/* TRANG CHỦ & CHI TIẾT DÀNH CHO KHÁCH */}
         <Route path="/" element={<CustomerHome />} />
         <Route path="/buy/:categoryId" element={<ProductDetail />} />
         
-        {/* LOGIN ROUTE */}
+        {/* ĐĂNG NHẬP ADMIN */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* ADMIN PRIVATE ROUTES */}
+        {/* CÁC TRANG QUẢN TRỊ (ADMIN) */}
         <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
         <Route path="/admin/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
         <Route path="/admin/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
-        <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-        <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><UserAuth /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -21,8 +21,8 @@ namespace ASP.NET.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            // Lấy kèm thông tin Category để hiển thị bên Admin
-            var products = _context.Products.Include(p => p.Category).ToList();
+            // Lấy dữ liệu sản phẩm (bỏ Include để tránh lỗi JSON vòng lặp)
+            var products = _context.Products.ToList();
             return Ok(products);
         }
 
