@@ -1,216 +1,162 @@
 import React, { useState, useEffect } from 'react';
-import { productApi, orderApi, bannerApi } from '../api';
 import CustomerHeader from '../components/CustomerHeader';
 import CustomerFooter from '../components/CustomerFooter';
-import { ShoppingCart, Zap, Star, ShieldCheck, Ticket, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Zap, Ticket, ShoppingCart, Trash2, Mail, Info } from 'lucide-react';
+
+// DỮ LIỆU TĨNH (STATIC DATA) THEO ẢNH MẪU
+const STATIC_PRODUCTS = [
+    { id: 1, name: 'Garena', price: 5000, stock: 659, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 2, name: 'Garena', price: 10000, stock: 354, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 3, name: 'Garena', price: 20000, stock: 432, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 4, name: 'Garena', price: 50000, stock: 374, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 5, name: 'Garena', price: 100000, stock: 406, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 6, name: 'Garena', price: 200000, stock: 260, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+    { id: 7, name: 'Garena', price: 500000, stock: 394, discount: 4, logo: 'https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png' },
+];
+
+const STATIC_BANNERS = [
+    { id: 1, title: 'Nạp Thẻ Garena Giá Rẻ', description: 'Chiết khấu cực cao lên đến 4% cho mọi mệnh giá', imageUrl: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1400' }
+];
 
 const CustomerHome = () => {
-  const [products, setProducts] = useState([]);
-  const [banners, setBanners] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('userData');
-    if (savedUser) setUser(JSON.parse(savedUser));
-
-    // Lấy Category từ URL
-    const params = new URLSearchParams(window.location.search);
-    const categoryId = params.get('category');
-
-    // Fetch Products
-    productApi.getAll().then(res => {
-        let data = res.data;
-        if (categoryId) {
-            data = data.filter(p => p.categoryId === parseInt(categoryId));
-        }
-        setProducts(data);
-    }).catch(console.error);
-
-    // Fetch Banners
-    bannerApi.getAll().then(res => {
-        setBanners(res.data);
-        setLoading(false);
-    }).catch(() => {
-        setLoading(false);
-    });
-  }, [window.location.search]); // Chạy lại khi URL thay đổi
-
-  useEffect(() => {
-    if (banners.length > 0) {
-        const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % banners.length);
-        }, 5000);
-        return () => clearInterval(timer);
+    if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        setEmail(parsedUser.email || '');
     }
-  }, [banners]);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userData');
-    setUser(null);
-  };
-
-  const handleBuy = async (product) => {
-    if (!user) {
-        alert('Vui lòng đăng nhập để thực hiện mua hàng và tích điểm!');
-        return;
-    }
-    try {
-        const orderData = { customerId: user.id, productId: product.id, totalAmount: product.price, orderDate: new Date().toISOString() };
-        await orderApi.create(orderData);
-        alert(`Chúc mừng! Bạn đã mua ${product.name} thành công.`);
-        window.location.reload();
-    } catch (error) {
-        alert('Có lỗi xảy ra. Vui lòng thử lại.');
-    }
+  const handleCheckout = () => {
+    if (!selectedProduct) return alert('Vui lòng chọn mệnh giá!');
+    if (!email) return alert('Vui lòng nhập Email!');
+    alert(`Thanh toán thành công cho ${quantity} thẻ ${selectedProduct.name} mệnh giá ${selectedProduct.price.toLocaleString()}đ!`);
   };
 
   return (
-    <div style={{ background: '#020617', minHeight: '100vh', color: 'white' }}>
-      <CustomerHeader user={user} handleLogout={handleLogout} />
+    <div style={{ background: '#f8fafc', minHeight: '100vh', paddingBottom: '100px' }}>
+      <CustomerHeader user={user} handleLogout={() => setUser(null)} />
 
-      {/* Hero Banner Slideshow Section */}
-      <section style={{ 
-        position: 'relative', height: '80vh', minHeight: '600px', 
-        overflow: 'hidden', padding: 0 
-      }}>
-        {banners.length > 0 ? banners.map((banner, index) => (
-          <div key={banner.id || index} style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            opacity: currentSlide === index ? 1 : 0,
-            transition: 'opacity 1s ease-in-out',
-            zIndex: currentSlide === index ? 1 : 0
-          }}>
-            {/* Background Image with Overlay */}
-            <div style={{
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                backgroundImage: `linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.9)), url(${banner.imageUrl})`,
-                backgroundSize: 'cover', backgroundPosition: 'center'
-            }}></div>
-
-            {/* Content */}
-            <div style={{ 
-                position: 'relative', zIndex: 10, height: '100%', 
-                display: 'flex', flexDirection: 'column', justifyContent: 'center', 
-                alignItems: 'center', textAlign: 'center', padding: '0 5%'
-            }}>
-                <div style={{ 
-                    display: 'inline-flex', alignItems: 'center', gap: '8px',
-                    padding: '6px 16px', background: 'rgba(99, 102, 241, 0.1)',
-                    borderRadius: '50px', border: '1px solid rgba(99, 102, 241, 0.2)',
-                    color: '#818cf8', fontSize: '0.85rem', fontWeight: 600, marginBottom: '24px'
-                }}>
-                    <Zap size={14} fill="currentColor" /> HỆ THỐNG TÍCH ĐIỂM TỰ ĐỘNG 1%
-                </div>
-                <h1 style={{ fontSize: '4.5rem', fontWeight: 900, marginBottom: '24px', maxWidth: '900px', lineHeight: 1.1 }}>
-                    {banner.title}
-                </h1>
-                <p style={{ fontSize: '1.25rem', color: '#cbd5e1', maxWidth: '700px', marginBottom: '40px' }}>
-                    {banner.description}
-                </p>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <button style={{ 
-                        background: '#6366f1', color: 'white', padding: '16px 40px', 
-                        borderRadius: '16px', border: 'none', fontWeight: 700, fontSize: '1.1rem',
-                        cursor: 'pointer', boxShadow: '0 10px 30px rgba(99, 102, 241, 0.4)'
-                    }}>Bắt Đầu Ngay</button>
-                    <button style={{ 
-                        background: 'rgba(255,255,255,0.1)', color: 'white', padding: '16px 40px', 
-                        borderRadius: '16px', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 700, 
-                        fontSize: '1.1rem', cursor: 'pointer', backdropFilter: 'blur(10px)'
-                    }}>Xem Bảng Giá</button>
-                </div>
+      {/* Hero Mini Banner */}
+      <div style={{ marginTop: '80px', padding: '0 5%' }}>
+        <div style={{ 
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+            borderRadius: '24px', padding: '50px', color: 'white',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        }}>
+            <div>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '10px' }}>{STATIC_BANNERS[0].title}</h1>
+                <p style={{ fontSize: '1.1rem', opacity: 0.7 }}>{STATIC_BANNERS[0].description}</p>
             </div>
-          </div>
-        )) : (
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#020617' }}>
-                <p style={{ color: '#64748b' }}>Đang tải banner hoặc chưa có banner nào được kích hoạt...</p>
-            </div>
-        )}
+            <img src="https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png" style={{ height: '120px', filter: 'drop-shadow(0 0 20px rgba(99,102,241,0.4))' }} alt="Garena" />
+        </div>
+      </div>
 
-        {/* Navigation Dots */}
-        {banners.length > 0 && (
-            <div style={{ 
-                position: 'absolute', bottom: '40px', left: '50%', transform: 'translateX(-50%)', 
-                zIndex: 20, display: 'flex', gap: '12px' 
-            }}>
-                {banners.map((_, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => setCurrentSlide(i)}
-                      style={{ 
-                        width: currentSlide === i ? '40px' : '10px', height: '10px', 
-                        borderRadius: '10px', border: 'none', background: currentSlide === i ? '#6366f1' : 'rgba(255,255,255,0.3)',
-                        cursor: 'pointer', transition: '0.3s'
-                      }}
-                    ></button>
+      <main style={{ maxWidth: '1400px', margin: '40px auto', padding: '0 5%', display: 'grid', gridTemplateColumns: '1fr 400px', gap: '30px' }}>
+        
+        {/* LEFT: STATIC PRODUCTS GRID */}
+        <section>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+                <img src="https://cdn.divineshop.vn/image/catalog/Logo/Logo-Garena.png" style={{ height: '35px' }} alt="" />
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Thẻ Garena</h2>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
+                {STATIC_PRODUCTS.map(p => (
+                    <div 
+                        key={p.id} 
+                        onClick={() => setSelectedProduct(p)}
+                        style={{ 
+                            background: selectedProduct?.id === p.id ? '#000080' : '#e5e7eb',
+                            color: selectedProduct?.id === p.id ? 'white' : '#1e293b',
+                            padding: '25px 15px', borderRadius: '12px', textAlign: 'center',
+                            cursor: 'pointer', transition: '0.2s', position: 'relative',
+                            boxShadow: selectedProduct?.id === p.id ? '0 10px 20px rgba(0,0,128,0.2)' : 'none'
+                        }}
+                    >
+                        {selectedProduct?.id === p.id && (
+                            <div style={{ position: 'absolute', top: '8px', right: '8px', background: 'white', color: '#000080', borderRadius: '50%', padding: '2px' }}>
+                                <Zap size={14} fill="currentColor" />
+                            </div>
+                        )}
+                        <p style={{ fontSize: '1rem', fontWeight: 700, color: selectedProduct?.id === p.id ? '#4ade80' : '#16a34a', marginBottom: '5px' }}>
+                            {p.stock} {p.name}
+                        </p>
+                        <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{p.price.toLocaleString()}đ</h3>
+                    </div>
                 ))}
             </div>
-        )}
+        </section>
 
-        {/* Side Controls */}
-        {banners.length > 0 && (
-            <>
-                <button onClick={() => setCurrentSlide(prev => (prev - 1 + banners.length) % banners.length)}
-                        style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.05)', border: 'none', padding: '15px', borderRadius: '50%', color: 'white', cursor: 'pointer' }}>
-                    <ChevronLeft size={24} />
-                </button>
-                <button onClick={() => setCurrentSlide(prev => (prev + 1) % banners.length)}
-                        style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.05)', border: 'none', padding: '15px', borderRadius: '50%', color: 'white', cursor: 'pointer' }}>
-                    <ChevronRight size={24} />
-                </button>
-            </>
-        )}
-      </section>
-
-      {/* Product Section */}
-      <section id="products" style={{ padding: '100px 5% 120px' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
-                <div>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '12px' }}>Kho Thẻ Cào</h2>
-                    <p style={{ color: '#64748b' }}>Hàng mới cập nhật hàng giờ từ các nhà mạng lớn</p>
+        {/* RIGHT: CHECKOUT PANEL */}
+        <aside>
+            <div style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', overflow: 'hidden', position: 'sticky', top: '100px' }}>
+                <div style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#000080', borderBottom: '1px solid #f1f5f9' }}>
+                    <h3 style={{ fontWeight: 800, fontSize: '1.2rem' }}>Giỏ hàng</h3>
+                    <ShoppingCart size={20} />
                 </div>
-                <div style={{ padding: '8px 20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', fontSize: '0.9rem' }}>
-                    Sẵn có: <span style={{ color: '#6366f1', fontWeight: 700 }}>{products.length} loại</span>
+
+                <div style={{ padding: '25px' }}>
+                    {selectedProduct ? (
+                        <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '25px' }}>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{selectedProduct.name} {selectedProduct.price.toLocaleString()}đ</div>
+                                    <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>Chiết khấu: {selectedProduct.discount}%</div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                        <input 
+                                            type="number" min="1" value={quantity} 
+                                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                            style={{ width: '55px', height: '35px', textAlign: 'center', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                                        />
+                                    </div>
+                                    <button onClick={() => setSelectedProduct(null)} style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                                </div>
+                            </div>
+
+                            <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+                                    <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>Tổng:</span>
+                                    <span style={{ fontSize: '1.6rem', fontWeight: 900, color: '#ef4444' }}>
+                                        {(selectedProduct.price * quantity * (1 - selectedProduct.discount/100)).toLocaleString()} đ
+                                    </span>
+                                </div>
+
+                                <div style={{ marginBottom: '25px' }}>
+                                    <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, marginBottom: '8px' }}>Email</label>
+                                    <input 
+                                        type="email" placeholder="Email nhận mã..." 
+                                        value={email} onChange={e => setEmail(e.target.value)}
+                                        style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
+                                    />
+                                </div>
+
+                                <button 
+                                    onClick={handleCheckout}
+                                    style={{ width: '100%', padding: '15px', borderRadius: '8px', background: '#000080', color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer' }}>
+                                    THANH TOÁN
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '30px 0', color: '#94a3b8' }}>
+                             <p>Vui lòng chọn mệnh giá thẻ muốn mua</p>
+                        </div>
+                    )}
                 </div>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '30px' }}>
-            {loading ? (
-                Array(4).fill(0).map((_, i) => (
-                    <div key={i} style={{ height: '350px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px' }}></div>
-                ))
-            ) : products.map(product => (
-                <div key={product.id} className="product-card" style={{ 
-                    background: 'rgba(30, 41, 59, 0.4)', padding: '30px', 
-                    borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)',
-                    transition: '0.3s', textAlign: 'center', position: 'relative', overflow: 'hidden'
-                }}>
-                    <div style={{ width: '80px', height: '80px', borderRadius: '20px', background: 'rgba(255,255,255,0.03)', margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Ticket size={40} style={{ color: '#6366f1' }} />
-                    </div>
-                    <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>{product.name}</h3>
-                    <div style={{ background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '16px', marginBottom: '24px' }}>
-                        <p style={{ fontSize: '1.5rem', fontWeight: 800 }}>{product.price.toLocaleString()} <span style={{ fontSize: '0.85rem', color: '#6366f1' }}>VNĐ</span></p>
-                    </div>
-                    <button onClick={() => handleBuy(product)} style={{ width: '100%', padding: '14px', borderRadius: '14px', background: '#6366f1', color: 'white', border: 'none', fontWeight: 700, cursor: 'pointer', transition: '0.3s' }}>
-                        Mua Ngay
-                    </button>
-                    <div style={{ marginTop: '15px', fontSize: '0.75rem', color: '#10b981' }}>+{(product.price * 0.01 / 1000).toFixed(0)} points reward</div>
-                </div>
-            ))}
-            </div>
-        </div>
-      </section>
+        </aside>
+      </main>
 
       <CustomerFooter />
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        .product-card:hover { transform: translateY(-10px); border-color: rgba(99, 102, 241, 0.4); }
-      `}} />
     </div>
   );
 };

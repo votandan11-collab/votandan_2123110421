@@ -10,6 +10,7 @@ namespace ASP.NET.Models
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public string? ImageUrl { get; set; }
+        public decimal DiscountRate { get; set; } = 4; // % chiết khấu mặc định là 4%
 
         // --- PHẦN THAY ĐỔI ĐỂ LIÊN KẾT CATEGORY ---
         public int CategoryId { get; set; }

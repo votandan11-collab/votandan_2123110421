@@ -78,9 +78,10 @@ using (var scope = app.Services.CreateScope())
             context.Database.ExecuteSqlRaw(bannerSql);
         } catch { /* Bỏ qua nếu đã tồn tại */ }
 
-        // 2. Thêm cột ImageUrl cho Products
+        // 2. Thêm cột ImageUrl và DiscountRate cho Products
         try {
             context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"ImageUrl\" TEXT;");
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"DiscountRate\" DECIMAL DEFAULT 4;");
         } catch { /* Bỏ qua nếu đã tồn tại */ }
 
         Console.WriteLine("--- DATABASE: Khởi tạo hoàn tất ---");
