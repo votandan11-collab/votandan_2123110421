@@ -89,16 +89,16 @@ const Categories = () => {
                 <div style={{ background: 'var(--card-bg)', padding: '2rem', borderRadius: '1rem', border: '1px solid var(--border)', marginBottom: '2rem' }}>
                     <form onSubmit={handleSave} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div>
-                            <label className="input-label">Tên danh mục (Vd: Viettel, Mobifone...)</label>
+                            <label className="input-label">Tên nhà mạng (Vd: Viettel, Garena...)</label>
                             <input type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
                         </div>
                         <div>
-                            <label className="input-label">Mô tả ngắn</label>
-                            <input type="text" className="input-field" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                            <label className="input-label">Link Logo nhà mạng (URL)</label>
+                            <input type="text" className="input-field" placeholder="https://example.com/logo.png" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>
                             <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                                <Save size={18} /> {editingId ? 'Cập nhật danh mục' : 'Lưu danh mục mới'}
+                                <Save size={18} /> {editingId ? 'Cập nhật danh mục' : 'Lưu nhà mạng mới'}
                             </button>
                         </div>
                     </form>
@@ -107,7 +107,7 @@ const Categories = () => {
 
             <div className="search-box" style={{ marginBottom: '2rem', maxWidth: '400px' }}>
                 <Search size={18} />
-                <input type="text" placeholder="Tìm kiếm danh mục..." value={search} onChange={e => setSearch(e.target.value)} />
+                <input type="text" placeholder="Tìm kiếm nhà mạng..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
             <div className="table-container">
@@ -115,8 +115,8 @@ const Categories = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Tên danh mục</th>
-                                <th>Mô tả</th>
+                                <th>Hình Ảnh / Logo</th>
+                                <th>Tên nhà mạng</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
@@ -124,14 +124,17 @@ const Categories = () => {
                             {filteredCategories.map((c) => (
                                 <tr key={c.id}>
                                     <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ padding: '8px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '10px' }}>
-                                                <Folder size={18} color="#6366f1" />
-                                            </div>
-                                            <span style={{ fontWeight: 600 }}>{c.name}</span>
+                                        <div style={{ width: '80px', height: '40px', background: 'white', borderRadius: '6px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                                            {c.description && c.description.startsWith('http') ? (
+                                                <img src={c.description} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                            ) : (
+                                                <Folder size={20} color="#94a3b8" />
+                                            )}
                                         </div>
                                     </td>
-                                    <td style={{ color: 'var(--text-muted)' }}>{c.description || 'Không có mô tả'}</td>
+                                    <td>
+                                        <span style={{ fontWeight: 600, fontSize: '1.05rem' }}>{c.name}</span>
+                                    </td>
                                     <td>
                                         <div style={{ display: 'flex', gap: '10px' }}>
                                             <button onClick={() => startEdit(c)} className="btn" style={{ background: 'rgba(255,255,255,0.05)' }}><Edit2 size={14} /></button>

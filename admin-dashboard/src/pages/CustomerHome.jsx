@@ -1,34 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { categoryApi } from '../api';
+import { categoryApi, bannerApi } from '../api';
 import CustomerHeader from '../components/CustomerHeader';
 import CustomerFooter from '../components/CustomerFooter';
 import { CreditCard } from 'lucide-react';
 
 const CustomerHome = () => {
   const [categories, setCategories] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('userData');
     if (savedUser) setUser(JSON.parse(savedUser));
 
-    // Lấy dữ liệu nhà mạng từ Database
-    categoryApi.getAll().then(res => {
-        setCategories(res.data);
-        setLoading(false);
-    }).catch(err => {
-        console.error(err);
-        setLoading(false);
-    });
+    // Lấy dữ liệu Banners và Danh mục từ Database
+    Promise.all([categoryApi.getAll(), bannerApi.getAll()])
+        .then(([catRes, bannerRes]) => {
+            setCategories(catRes.data);
+            setBanners(bannerRes.data);
+            setLoading(false);
+        }).catch(err => {
+            console.error(err);
+            setLoading(false);
+        });
   }, []);
+
+  useEffect(() => {
+    if (banners.length > 0) {
+        const timer = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % banners.length);
+        }, 5000);
+        return () => clearInterval(timer);
+    }
+  }, [banners]);
 
   return (
     <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
       <CustomerHeader user={user} handleLogout={() => setUser(null)} />
 
-      <main style={{ maxWidth: '1200px', margin: '120px auto 80px', padding: '0 20px' }}>
+      {/* Hero Banner (Dynamic) */}
+      <section style={{ position: 'relative', height: '40vh', minHeight: '300px', overflow: 'hidden', marginTop: '60px' }}>
+        {banners.length > 0 ? banners.map((banner, index) => (
+          <div key={banner.id} style={{
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            opacity: currentSlide === index ? 1 : 0, transition: 'opacity 1s', zIndex: currentSlide === index ? 1 : 0
+          }}>
+            <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${banner.imageUrl})`,
+                backgroundSize: 'cover', backgroundPosition: 'center'
+            }}></div>
+            <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', color: 'white', padding: '0 5%' }}>
+                <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '10px', textShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>{banner.title}</h1>
+                <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>{banner.description}</p>
+            </div>
+          </div>
+        )) : <div style={{ height: '100%', background: '#1e293b' }}></div>}
+      </section>
+
+      <main style={{ maxWidth: '1200px', margin: '60px auto 80px', padding: '0 20px' }}>
         
         {/* THÔNG BÁO CHÀO MỪNG */}
         <div style={{ textAlign: 'center', marginBottom: '50px' }}>
@@ -58,7 +91,6 @@ const CustomerHome = () => {
                         width: '140px', height: '80px', overflow: 'hidden', 
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        {/* Chúng ta dùng description như link logo hoặc bạn có thể dán link logo vào Dashboard của Category */}
                         {cat.description && cat.description.startsWith('http') ? (
                             <img src={cat.description} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt={cat.name} />
                         ) : (

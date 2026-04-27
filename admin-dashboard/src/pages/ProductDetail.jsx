@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { productApi, categoryApi, orderApi } from '../api';
 import CustomerHeader from '../components/CustomerHeader';
 import CustomerFooter from '../components/CustomerFooter';
-import { ShoppingCart, Trash2, Mail, Zap, ChevronLeft, CreditCard } from 'lucide-react';
+import { ShoppingCart, Trash2, Mail, Zap, ChevronLeft, CreditCard, X } from 'lucide-react';
 
 const ProductDetail = () => {
     const { categoryId } = useParams();
@@ -118,18 +118,21 @@ const ProductDetail = () => {
                         <div style={{ padding: '20px' }}>
                             {selectedProduct ? (
                                 <>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                                         <div>
-                                            <div style={{ fontWeight: 800 }}>{selectedProduct.name} {selectedProduct.price.toLocaleString()}đ</div>
+                                            <div style={{ fontWeight: 800, color: '#1e293b' }}>{selectedProduct.name} {selectedProduct.price.toLocaleString()}đ</div>
                                             <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Chiết khấu: {selectedProduct.discountRate || 4}%</div>
                                         </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                             <input 
                                                 type="number" min="1" value={quantity} 
                                                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                                style={{ width: '50px', padding: '5px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                                                style={{ width: '60px', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center', fontSize: '1rem' }}
                                             />
-                                            <button onClick={() => setSelectedProduct(null)} style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                                            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0f172a' }}>
+                                                {(selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)).toLocaleString()}đ
+                                            </span>
+                                            <button onClick={() => setSelectedProduct(null)} style={{ border: 'none', background: '#ef4444', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', cursor: 'pointer' }}><X size={16} /></button>
                                         </div>
                                     </div>
 
