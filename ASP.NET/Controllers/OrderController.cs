@@ -124,7 +124,8 @@ namespace ASP.NET.Controllers
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    return StatusCode(500, $"Lỗi xử lý đơn hàng: {ex.Message}");
+                    var innerError = ex.InnerException != null ? ($" | Chi tiết: {ex.InnerException.Message}") : "";
+                    return StatusCode(500, $"Lỗi hệ thống: {ex.Message}{innerError}");
                 }
             }
         }

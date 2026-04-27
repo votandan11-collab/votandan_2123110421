@@ -62,7 +62,7 @@ const ProductDetail = () => {
             const orderData = { 
                 CustomerId: user?.Id || user?.id || 0,
                 TotalAmount: totalAmount,
-                UpdatedBy: `Mua: ${selectedProduct.Name || selectedProduct.name} (SL: ${quantity}) - Email: ${email}`
+                UpdatedBy: `Mua: ${selectedProduct.Name || selectedProduct.name} - ${email}`
             };
             
             await orderApi.create(orderData);
