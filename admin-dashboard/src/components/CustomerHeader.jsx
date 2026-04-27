@@ -119,7 +119,7 @@ const CustomerHeader = ({ user, handleLogout }) => {
               </button>
             </div>
           ) : (
-            <Link to="/user-auth" style={{ 
+            <Link to="/customer-login" style={{ 
               background: '#6366f1', color: 'white', padding: '11px 26px', 
               borderRadius: '14px', textDecoration: 'none', fontWeight: 700, fontSize: '0.95rem',
               boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)', transition: '0.3s'
@@ -127,7 +127,7 @@ const CustomerHeader = ({ user, handleLogout }) => {
             onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
             onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              Tham Gia Ngay
+              Đăng Nhập
             </Link>
           )}
           

@@ -38,7 +38,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" style={{ height: '100vh', overflowY: 'auto', flexShrink: 0, position: 'sticky', top: 0 }}>
       <div className="sidebar-header">
         <div className="logo-icon" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #a855f7 100%)' }}>
           <ShieldCheck size={24} />

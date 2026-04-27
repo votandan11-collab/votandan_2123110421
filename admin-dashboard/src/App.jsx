@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 // Public pages
 import CustomerHome from './pages/CustomerHome';
 import ProductDetail from './pages/ProductDetail'; 
+import CustomerLogin from './pages/CustomerLogin';
 import LoginPage from './pages/LoginPage';
 
 // Admin pages
@@ -23,11 +24,11 @@ import PointsHistory from './pages/PointsHistory';
 // Layouts
 import Sidebar from './components/Sidebar';
 
-// Giao diện Layout dành riêng cho Admin
+// Giao diện Layout dành riêng cho Admin (Fix layout)
 const AdminLayout = ({ children }) => (
   <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-main)' }}>
     <Sidebar />
-    <div style={{ flex: 1, padding: '2rem', height: '100vh', overflowY: 'auto' }}>
+    <div style={{ flex: 1, padding: '2rem', minHeight: '100vh', overflowY: 'auto', overflowX: 'hidden' }}>
       {children}
     </div>
   </div>
@@ -48,7 +49,10 @@ function App() {
         <Route path="/" element={<CustomerHome />} />
         <Route path="/buy/:categoryId" element={<ProductDetail />} />
         
-        {/* ĐĂNG NHẬP */}
+        {/* ĐĂNG NHẬP / ĐĂNG KÝ USER */}
+        <Route path="/customer-login" element={<CustomerLogin />} />
+
+        {/* ĐĂNG NHẬP ADMIN */}
         <Route path="/login" element={<LoginPage />} />
 
         {/* CÁC TRANG QUẢN TRỊ (ADMIN) */}

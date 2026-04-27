@@ -34,6 +34,8 @@ export const customerApi = {
   create: (data) => api.post('/Customers', data),
   update: (id, data) => api.put(`/Customers/${id}`, data),
   delete: (id) => api.delete(`/Customers/${id}`),
+  login: (data) => api.post('/Customers/login', data),
+  register: (data) => api.post('/Customers/register', data),
 };
 
 export const orderApi = {
