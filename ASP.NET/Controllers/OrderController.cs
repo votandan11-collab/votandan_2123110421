@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ASP.NET.Data;
 using ASP.NET.Models;
 using Microsoft.EntityFrameworkCore;
@@ -103,7 +103,9 @@ namespace ASP.NET.Controllers
                     // --- BƯỚC 4: LƯU THÔNG TIN ĐƠN HÀNG ---
                     order.CreatedAt = DateTime.Now;
                     order.UpdatedAt = DateTime.Now;
-                    order.UpdatedBy = "System_Auto";
+                    if (string.IsNullOrEmpty(order.UpdatedBy)) {
+                        order.UpdatedBy = "System_Auto";
+                    }
                     _context.Orders.Add(order);
 
                     // THỰC THI LƯU TẤT CẢ VÀO DB

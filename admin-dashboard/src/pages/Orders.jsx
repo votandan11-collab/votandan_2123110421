@@ -35,7 +35,7 @@ const Orders = () => {
 
     const filteredOrders = orders.filter(o => 
         o.id.toString().includes(searchTerm) || 
-        o.customer?.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+        (o.customer?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -106,8 +106,8 @@ const Orders = () => {
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontWeight: 500 }}>{order.customer?.fullName || 'Guest'}</span>
-                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customer?.phone}</span>
+                                            <span style={{ fontWeight: 500 }}>{order.customer?.name || 'Guest'}</span>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{order.customer?.email}</span>
                                         </div>
                                     </td>
                                     <td>

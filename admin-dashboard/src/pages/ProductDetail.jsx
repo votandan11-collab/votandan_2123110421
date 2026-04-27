@@ -57,19 +57,21 @@ const ProductDetail = () => {
         try {
             const discount = selectedProduct.discountRate || 4;
             const totalAmount = selectedProduct.price * quantity * (1 - discount/100);
+            
+            // Chỉ dùng các trường chắc chắn đã có trong DB của bạn để tránh lỗi 500
             const orderData = { 
-                customerId: user?.id || 0,
-                productId: selectedProduct.id, 
-                totalAmount: totalAmount,
-                orderDate: new Date().toISOString(),
-                notes: `Email: ${email}, SL: ${quantity}`
+                CustomerId: user?.Id || user?.id || 0,
+                TotalAmount: totalAmount,
+                UpdatedBy: `Mua: ${selectedProduct.Name || selectedProduct.name} (SL: ${quantity}) - Email: ${email}`
             };
+            
             await orderApi.create(orderData);
             alert(`Mua thẻ thành công! Hệ thống đang kiểm duyệt thanh toán cho ${email}.`);
             setSelectedProduct(null);
             setShowQR(false);
         } catch (error) {
-            alert('Lỗi đặt hàng.');
+            console.error('Order error:', error.response?.data || error.message);
+            alert('Lỗi đặt hàng: ' + (error.response?.data || 'Vui lòng thử lại sau.'));
         }
     }
 
@@ -89,24 +91,24 @@ const ProductDetail = () => {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
                         {loading ? <p>Đang tải mệnh giá...</p> : products.map(p => (
                             <div 
-                                key={p.id} 
+                                key={p.Id || p.id} 
                                 onClick={() => setSelectedProduct(p)}
                                 style={{ 
-                                    background: selectedProduct?.id === p.id ? '#000080' : '#e5e7eb',
-                                    color: selectedProduct?.id === p.id ? 'white' : '#1e293b',
+                                    background: (selectedProduct?.Id || selectedProduct?.id) === (p.Id || p.id) ? '#000080' : '#e5e7eb',
+                                    color: (selectedProduct?.Id || selectedProduct?.id) === (p.Id || p.id) ? 'white' : '#1e293b',
                                     padding: '25px 15px', borderRadius: '8px', textAlign: 'center',
                                     cursor: 'pointer', transition: '0.2s', position: 'relative'
                                 }}
                             >
-                                {selectedProduct?.id === p.id && (
+                                {(selectedProduct?.Id || selectedProduct?.id) === (p.Id || p.id) && (
                                     <div style={{ position: 'absolute', top: '8px', right: '8px', background: 'white', color: '#000080', borderRadius: '50%', padding: '2px' }}>
                                         <Zap size={14} fill="currentColor" />
                                     </div>
                                 )}
-                                <div style={{ fontSize: '1rem', fontWeight: 700, color: selectedProduct?.id === p.id ? '#4ade80' : '#16a34a', marginBottom: '5px' }}>
-                                    {p.stock} {category?.name}
+                                <div style={{ fontSize: '1rem', fontWeight: 700, color: (selectedProduct?.Id || selectedProduct?.id) === (p.Id || p.id) ? '#4ade80' : '#16a34a', marginBottom: '5px' }}>
+                                    {p.Stock || p.stock} {category?.Name || category?.name}
                                 </div>
-                                <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{p.price.toLocaleString()}đ</div>
+                                <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{(p.Price || p.price || 0).toLocaleString()}đ</div>
                             </div>
                         ))}
                     </div>
@@ -125,8 +127,8 @@ const ProductDetail = () => {
                                 <>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                                         <div>
-                                            <div style={{ fontWeight: 800, color: '#1e293b' }}>{selectedProduct.name} {selectedProduct.price.toLocaleString()}đ</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Chiết khấu: {selectedProduct.discountRate || 4}%</div>
+                                            <div style={{ fontWeight: 800, color: '#1e293b' }}>{selectedProduct.Name || selectedProduct.name} {(selectedProduct.Price || selectedProduct.price || 0).toLocaleString()}đ</div>
+                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>Chiết khấu: {selectedProduct.DiscountRate || selectedProduct.discountRate || 4}%</div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                                             <input 
@@ -135,7 +137,7 @@ const ProductDetail = () => {
                                                 style={{ width: '60px', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center', fontSize: '1rem' }}
                                             />
                                             <span style={{ fontWeight: 800, fontSize: '1.1rem', color: '#0f172a' }}>
-                                                {(selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)).toLocaleString()}đ
+                                                {((selectedProduct.Price || selectedProduct.price || 0) * quantity * (1 - (selectedProduct.DiscountRate || selectedProduct.discountRate || 4)/100)).toLocaleString()}đ
                                             </span>
                                             <button onClick={() => setSelectedProduct(null)} style={{ border: 'none', background: '#ef4444', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', cursor: 'pointer' }}><X size={16} /></button>
                                         </div>
@@ -145,7 +147,7 @@ const ProductDetail = () => {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                                             <span style={{ fontWeight: 800 }}>Tổng:</span>
                                             <span style={{ fontSize: '1.5rem', fontWeight: 900, color: '#ef4444' }}>
-                                                {(selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)).toLocaleString()} đ
+                                                {((selectedProduct.Price || selectedProduct.price || 0) * quantity * (1 - (selectedProduct.DiscountRate || selectedProduct.discountRate || 4)/100)).toLocaleString()} đ
                                             </span>
                                         </div>
 
@@ -192,13 +194,13 @@ const ProductDetail = () => {
                             <div style={{ marginBottom: '20px' }}>
                                 <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>Tổng thanh toán:</div>
                                 <div style={{ fontSize: '2rem', fontWeight: 900, color: '#ef4444' }}>
-                                    {(selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)).toLocaleString()} đ
+                                    {((selectedProduct.Price || selectedProduct.price || 0) * quantity * (1 - (selectedProduct.DiscountRate || selectedProduct.discountRate || 4)/100)).toLocaleString()} đ
                                 </div>
                             </div>
 
                             <div style={{ background: '#fff', padding: '15px', borderRadius: '15px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                                 <img 
-                                    src={`https://img.vietqr.io/image/970422-0379518671-compact.jpg?amount=${selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)}&addInfo=Thanh toan the ${category?.name} ${selectedProduct.price}`} 
+                                    src={`https://img.vietqr.io/image/970422-0379518671-compact.jpg?amount=${(selectedProduct.Price || selectedProduct.price || 0) * quantity * (1 - (selectedProduct.DiscountRate || selectedProduct.discountRate || 4)/100)}&addInfo=Thanh toan the ${category?.Name || category?.name} ${(selectedProduct.Price || selectedProduct.price || 0)}`} 
                                     style={{ width: '100%', height: 'auto', borderRadius: '10px' }} 
                                     alt="QR Thanh Toán" 
                                 />
