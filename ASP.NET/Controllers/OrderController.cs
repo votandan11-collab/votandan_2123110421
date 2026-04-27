@@ -96,13 +96,13 @@ namespace ASP.NET.Controllers
                         Points = pointsEarned,
                         Type = "Add",
                         Description = $"Tích điểm từ đơn hàng #{DateTime.Now.Ticks % 10000}. Hệ số x{multiplier}",
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTime.UtcNow
                     };
                     _context.PointsHistories.Add(pointLog);
 
                     // --- BƯỚC 4: LƯU THÔNG TIN ĐƠN HÀNG ---
-                    order.CreatedAt = DateTime.Now;
-                    order.UpdatedAt = DateTime.Now;
+                    order.CreatedAt = DateTime.UtcNow;
+                    order.UpdatedAt = DateTime.UtcNow;
                     if (string.IsNullOrEmpty(order.UpdatedBy)) {
                         order.UpdatedBy = "System_Auto";
                     }
@@ -142,7 +142,7 @@ namespace ASP.NET.Controllers
             order.CustomerId = updatedOrder.CustomerId;
 
             // Ghi lại dấu vết chỉnh sửa
-            order.UpdatedAt = DateTime.Now;
+            order.UpdatedAt = DateTime.UtcNow;
             order.UpdatedBy = string.IsNullOrEmpty(adminName) ? "Admin_Anonymous" : adminName;
 
             _context.SaveChanges();

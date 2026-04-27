@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,7 +22,7 @@ namespace ASP.NET.Models
         [StringLength(255)]
         public string Description { get; set; } // Ví dụ: "Tích điểm đơn hàng", "Đổi trà sữa"
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Thiết lập mối quan hệ với bảng Customer
         [ForeignKey("CustomerId")]
