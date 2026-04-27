@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Search, UserPlus, Filter, MoreHorizontal, User, Award, Phone, Wallet } from 'lucide-react';
+import { Users, Search, UserPlus, Filter, MoreHorizontal, User, Award, Mail, Wallet } from 'lucide-react';
 import { customerApi } from '../api';
 
 const Customers = () => {
@@ -34,8 +34,8 @@ const Customers = () => {
     };
 
     const filteredCustomers = customers.filter(c => 
-        (c.fullName || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
-        (c.phone || "").includes(searchTerm)
+        (c.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+        (c.email || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -50,7 +50,7 @@ const Customers = () => {
                         <Search size={18} />
                         <input 
                             type="text" 
-                            placeholder="Search by name or phone..." 
+                            placeholder="Tìm theo tên hoặc email..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -102,11 +102,11 @@ const Customers = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Points</th>
-                                <th>Tier</th>
-                                <th>Action</th>
+                                <th>Tên</th>
+                                <th>Email</th>
+                                <th>Điểm</th>
+                                <th>Hạng</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,13 +125,13 @@ const Customers = () => {
                                             }}>
                                                 <User size={16} />
                                             </div>
-                                            {customer.fullName}
+                                            {customer.name || 'Chưa có tên'}
                                         </div>
                                     </td>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)' }}>
-                                            <Phone size={14} />
-                                            {customer.phone}
+                                            <Mail size={14} />
+                                            {customer.email || 'N/A'}
                                         </div>
                                     </td>
                                     <td>
