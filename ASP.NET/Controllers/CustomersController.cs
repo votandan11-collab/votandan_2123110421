@@ -91,9 +91,9 @@ namespace ASP.NET.Controllers
             return Ok(new { Message = "Đăng ký thành công!", user = new { id = request.Id, email = request.Email, name = request.Name } });
         }
 
-        // 🔐 LOGIN
+        // 🔐 LOGIN (dùng DTO riêng để tránh lỗi 400 thiếu trường)
         [HttpPost("login")]
-        public IActionResult Login([FromBody] Customer request)
+        public IActionResult Login([FromBody] CustomerLoginRequest request)
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
                 return BadRequest("Thông tin đăng nhập không hợp lệ");
@@ -111,5 +111,12 @@ namespace ASP.NET.Controllers
                 Token = "fake-jwt-" + user.Id + "-" + Guid.NewGuid().ToString().Substring(0, 8)
             });
         }
+    }
+
+    // DTO dành riêng cho Login (chỉ cần Email + Password)
+    public class CustomerLoginRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }
