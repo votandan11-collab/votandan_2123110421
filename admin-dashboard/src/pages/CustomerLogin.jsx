@@ -30,7 +30,16 @@ const CustomerLogin = () => {
         setFormData({ name: '', email: '', password: '' });
       }
     } catch (err) {
-      setError(err.response?.data || 'Có lỗi xảy ra. Hãy thử lại.');
+      const errData = err.response?.data;
+      if (typeof errData === 'string') {
+        setError(errData);
+      } else if (errData?.title) {
+        setError(errData.title);
+      } else if (errData?.errors) {
+        setError(Object.values(errData.errors).flat().join(', '));
+      } else {
+        setError('Có lỗi xảy ra. Hãy thử lại.');
+      }
     } finally {
       setLoading(false);
     }

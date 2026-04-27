@@ -25,7 +25,14 @@ const LoginPage = () => {
 
             navigate('/admin');
         } catch (err) {
-            setError(err.response?.data || 'Login failed. Please check your credentials.');
+            const errData = err.response?.data;
+            if (typeof errData === 'string') {
+                setError(errData);
+            } else if (errData?.title) {
+                setError(errData.title);
+            } else {
+                setError('Login failed. Please check your credentials.');
+            }
         } finally {
             setLoading(false);
         }
