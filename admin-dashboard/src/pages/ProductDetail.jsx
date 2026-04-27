@@ -16,6 +16,7 @@ const ProductDetail = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [email, setEmail] = useState('');
+    const [showQR, setShowQR] = useState(false);
 
     useEffect(() => {
         const savedUser = localStorage.getItem('userData');
@@ -46,10 +47,13 @@ const ProductDetail = () => {
         loadData();
     }, [categoryId]);
 
-    const handleCheckout = async () => {
+    const handleCheckout = () => {
         if (!selectedProduct) return alert('Vui lòng chọn mệnh giá!');
         if (!email) return alert('Vui lòng nhập Email!');
+        setShowQR(true);
+    };
 
+    const confirmOrder = async () => {
         try {
             const discount = selectedProduct.discountRate || 4;
             const totalAmount = selectedProduct.price * quantity * (1 - discount/100);
@@ -61,12 +65,13 @@ const ProductDetail = () => {
                 notes: `Email: ${email}, SL: ${quantity}`
             };
             await orderApi.create(orderData);
-            alert(`Mua thẻ thành công! Kiểm tra email ${email} nhé.`);
+            alert(`Mua thẻ thành công! Hệ thống đang kiểm duyệt thanh toán cho ${email}.`);
             setSelectedProduct(null);
+            setShowQR(false);
         } catch (error) {
             alert('Lỗi đặt hàng.');
         }
-    };
+    }
 
     return (
         <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
@@ -156,8 +161,7 @@ const ProductDetail = () => {
                                         <div style={{ marginBottom: '25px' }}>
                                             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, marginBottom: '5px' }}>Phương thức thanh toán:</label>
                                             <select style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '4px' }}>
-                                                <option>Chuyển khoản ngân hàng (server 2)</option>
-                                                <option>Ví điện tử Momo</option>
+                                                <option>Chuyển khoản MoMo / Ngân hàng</option>
                                             </select>
                                         </div>
 
@@ -175,6 +179,61 @@ const ProductDetail = () => {
                     </div>
                 </aside>
             </main>
+
+            {/* QR PAYMENT MODAL */}
+            {showQR && selectedProduct && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                    <div style={{ background: 'white', width: '100%', maxWidth: '450px', borderRadius: '20px', overflow: 'hidden', textAlign: 'center', animation: 'scaleIn 0.3s ease' }}>
+                        <div style={{ padding: '20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ fontWeight: 800, fontSize: '1.1rem' }}>Thanh toán qua QR</h3>
+                            <button onClick={() => setShowQR(false)} style={{ border: 'none', background: 'none', cursor: 'pointer' }}><X size={24} /></button>
+                        </div>
+                        <div style={{ padding: '30px' }}>
+                            <div style={{ marginBottom: '20px' }}>
+                                <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>Tổng thanh toán:</div>
+                                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#ef4444' }}>
+                                    {(selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)).toLocaleString()} đ
+                                </div>
+                            </div>
+
+                            <div style={{ background: '#fff', padding: '15px', borderRadius: '15px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                                <img 
+                                    src={`https://img.vietqr.io/image/970422-0379518671-compact.jpg?amount=${selectedProduct.price * quantity * (1 - (selectedProduct.discountRate || 4)/100)}&addInfo=Thanh toan the ${category?.name} ${selectedProduct.price}`} 
+                                    style={{ width: '100%', height: 'auto', borderRadius: '10px' }} 
+                                    alt="QR Thanh Toán" 
+                                />
+                                <div style={{ marginTop: '15px', textAlign: 'left', fontSize: '0.9rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                        <span style={{ color: '#64748b' }}>Chủ tài khoản:</span>
+                                        <span style={{ fontWeight: 700 }}>VÕ TẤN DÂN</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#64748b' }}>Số điện thoại (MoMo):</span>
+                                        <span style={{ fontWeight: 700 }}>0379518671</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '25px', lineHeight: '1.5' }}>
+                                Vui lòng quét mã QR trên và thực hiện chuyển khoản. Sau khi chuyển khoản thành công, nhấn "Xác nhận" để hoàn tất đơn hàng.
+                            </p>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <button 
+                                    onClick={() => setShowQR(false)}
+                                    style={{ padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', fontWeight: 700, cursor: 'pointer' }}>
+                                    HỦY
+                                </button>
+                                <button 
+                                    onClick={confirmOrder}
+                                    style={{ padding: '12px', borderRadius: '8px', border: 'none', background: '#16a34a', color: 'white', fontWeight: 700, cursor: 'pointer' }}>
+                                    XÁC NHẬN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <CustomerFooter />
         </div>
