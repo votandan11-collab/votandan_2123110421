@@ -48,11 +48,11 @@ export const orderApi = {
 };
 
 export const rewardApi = {
-  getAll: () => api.get('/Reward'),
-  create: (data) => api.post('/Reward', data),
-  redeem: (customerId, rewardId) => api.post(`/Reward/redeem?customerId=${customerId}&rewardId=${rewardId}`),
-  update: (id, data) => api.put(`/Reward/${id}`, data),
-  delete: (id) => api.delete(`/Reward/${id}`),
+  getAll: () => api.get('/Rewards'),
+  create: (data) => api.post('/Rewards', data),
+  redeem: (data) => api.post('/Rewards/redeem', data), // data: { CustomerId: x, RewardId: y }
+  update: (id, data) => api.put(`/Rewards/${id}`, data),
+  delete: (id) => api.delete(`/Rewards/${id}`),
 };
 
 export const pointsHistoryApi = {

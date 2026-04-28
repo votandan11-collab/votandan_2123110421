@@ -91,7 +91,7 @@ const CustomerHeader = ({ user, handleLogout }) => {
             </div>
 
             <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem' }}>Khuyến Mãi</Link>
-            <Link to="/" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem' }}>VIP Rewards</Link>
+            <Link to="/rewards" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 600, fontSize: '0.95rem' }}>VIP Rewards</Link>
           </nav>
 
           <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }}></div>
@@ -99,11 +99,11 @@ const CustomerHeader = ({ user, handleLogout }) => {
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: 700, fontSize: '0.9rem', color: 'white' }}>{user.name}</p>
+                <p style={{ fontWeight: 700, fontSize: '0.9rem', color: 'white' }}>{user.Name || user.name}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>{user.level}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>{user.Level || user.level || 'Silver'}</span>
                   <span style={{ fontSize: '0.75rem', color: '#6366f1' }}>•</span>
-                  <span style={{ fontSize: '0.75rem', color: '#6366f1', fontWeight: 700 }}>{user.totalPoints} pts</span>
+                  <span style={{ fontSize: '0.75rem', color: '#6366f1', fontWeight: 700 }}>{user.TotalPoints || user.totalPoints || 0} pts</span>
                 </div>
               </div>
               <button 

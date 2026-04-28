@@ -20,6 +20,7 @@ import Rewards from './pages/Rewards';
 import Stores from './pages/Stores';
 import Employees from './pages/Employees';
 import PointsHistory from './pages/PointsHistory';
+import CustomerRewards from './pages/CustomerRewards';
 
 // Layouts
 import Sidebar from './components/Sidebar';
@@ -48,6 +49,7 @@ function App() {
         {/* TRANG CHỦ & CHI TIẾT DÀNH CHO KHÁCH */}
         <Route path="/" element={<CustomerHome />} />
         <Route path="/buy/:categoryId" element={<ProductDetail />} />
+        <Route path="/rewards" element={<CustomerRewards />} />
         
         {/* ĐĂNG NHẬP / ĐĂNG KÝ USER */}
         <Route path="/customer-login" element={<CustomerLogin />} />
