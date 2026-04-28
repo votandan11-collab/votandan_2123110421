@@ -77,6 +77,43 @@ namespace ASP.NET.Controllers
                 }
             }
         }
+
+        // ➕ 3. Thêm quà tặng mới
+        [HttpPost]
+        public IActionResult Create([FromBody] Reward reward)
+        {
+            if (reward == null) return BadRequest("Dữ liệu không hợp lệ");
+            _context.Rewards.Add(reward);
+            _context.SaveChanges();
+            return Ok(reward);
+        }
+
+        // ✏️ 4. Cập nhật quà tặng
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] Reward updatedReward)
+        {
+            var reward = _context.Rewards.Find(id);
+            if (reward == null) return NotFound("Không tìm thấy quà tặng");
+
+            reward.RewardName = updatedReward.RewardName;
+            reward.PointsRequired = updatedReward.PointsRequired;
+            reward.StockQuantity = updatedReward.StockQuantity;
+
+            _context.SaveChanges();
+            return Ok(reward);
+        }
+
+        // ❌ 5. Xóa quà tặng
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var reward = _context.Rewards.Find(id);
+            if (reward == null) return NotFound("Không tìm thấy quà tặng");
+
+            _context.Rewards.Remove(reward);
+            _context.SaveChanges();
+            return Ok(new { Message = "Đã xóa quà tặng thành công" });
+        }
     }
 
     public class RedeemRequest
