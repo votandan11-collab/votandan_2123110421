@@ -80,7 +80,7 @@ namespace ASP.NET.Controllers
 
         // ➕ 3. Thêm quà tặng mới
         [HttpPost]
-        public IActionResult Create([FromBody] Reward reward, [FromQuery] string adminName)
+        public IActionResult Create([FromBody] Reward reward, [FromQuery] string? adminName = null)
         {
             if (reward == null) return BadRequest("Dữ liệu không hợp lệ");
             _context.Rewards.Add(reward);
@@ -100,7 +100,7 @@ namespace ASP.NET.Controllers
 
         // ✏️ 4. Cập nhật quà tặng
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Reward updatedReward, [FromQuery] string adminName)
+        public IActionResult Update(int id, [FromBody] Reward updatedReward, [FromQuery] string? adminName = null)
         {
             var reward = _context.Rewards.Find(id);
             if (reward == null) return NotFound("Không tìm thấy quà tặng");
@@ -126,7 +126,7 @@ namespace ASP.NET.Controllers
 
         // ❌ 5. Xóa quà tặng
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id, [FromQuery] string adminName)
+        public IActionResult Delete(int id, [FromQuery] string? adminName = null)
         {
             var reward = _context.Rewards.Find(id);
             if (reward == null) return NotFound("Không tìm thấy quà tặng");

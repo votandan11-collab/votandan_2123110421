@@ -51,10 +51,13 @@ const Products = () => {
                 stock: parseInt(formData.stock || 0),
                 discountRate: parseFloat(formData.discountRate || 4)
             };
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+
             if (editingId) {
-                await productApi.update(editingId, { ...payload, id: editingId });
+                await productApi.update(editingId, { ...payload, id: editingId }, adminName);
             } else {
-                await productApi.create(payload);
+                await productApi.create(payload, adminName);
             }
             setShowForm(false);
             setEditingId(null);
@@ -68,7 +71,9 @@ const Products = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
             try {
-                await productApi.delete(id);
+                const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+                const adminName = admin.fullName || 'Admin';
+                await productApi.delete(id, adminName);
                 fetchData();
             } catch (error) {
                 alert('Không thể xóa sản phẩm này.');

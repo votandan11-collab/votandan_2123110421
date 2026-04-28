@@ -132,7 +132,7 @@ namespace ASP.NET.Controllers
 
         // ✏️ 5. CẬP NHẬT ĐƠN HÀNG (Có Audit Log)
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Order updatedOrder, [FromQuery] string adminName)
+        public IActionResult Update(int id, [FromBody] Order updatedOrder, [FromQuery] string? adminName = null)
         {
             var order = _context.Orders.Find(id);
             if (order == null) return NotFound("Đơn hàng không tồn tại");

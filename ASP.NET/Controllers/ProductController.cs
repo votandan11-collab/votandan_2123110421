@@ -27,7 +27,7 @@ namespace ASP.NET.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Product product, [FromQuery] string adminName)
+        public IActionResult Create([FromBody] Product product, [FromQuery] string? adminName = null)
         {
             try {
                 var categoryExists = _context.Categories.Any(c => c.Id == product.CategoryId);
@@ -53,7 +53,7 @@ namespace ASP.NET.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product p, [FromQuery] string adminName)
+        public IActionResult Update(int id, [FromBody] Product p, [FromQuery] string? adminName = null)
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
@@ -84,7 +84,7 @@ namespace ASP.NET.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id, [FromQuery] string adminName)
+        public IActionResult Delete(int id, [FromQuery] string? adminName = null)
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
