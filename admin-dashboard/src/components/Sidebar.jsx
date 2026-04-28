@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   LogOut,
   CreditCard,
+  Terminal,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -29,6 +30,7 @@ const Sidebar = () => {
     { name: 'Points History', path: '/admin/points-history', icon: <History size={20} /> },
     { name: 'Stores', path: '/admin/stores', icon: <Store size={20} /> },
     { name: 'Employees', path: '/admin/employees', icon: <ShieldCheck size={20} /> },
+    { name: 'Activity Log', path: '/admin/activity', icon: <Terminal size={20} /> },
   ];
 
   const handleLogout = () => {

@@ -80,24 +80,45 @@ namespace ASP.NET.Controllers
 
         // ➕ 3. Thêm quà tặng mới
         [HttpPost]
-        public IActionResult Create([FromBody] Reward reward)
+        public IActionResult Create([FromBody] Reward reward, [FromQuery] string adminName)
         {
             if (reward == null) return BadRequest("Dữ liệu không hợp lệ");
             _context.Rewards.Add(reward);
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "CREATE",
+                EntityName = "Reward",
+                Details = $"Thêm quà tặng: {reward.RewardName}, Điểm: {reward.PointsRequired}",
+                CreatedAt = DateTime.UtcNow
+            });
+
             _context.SaveChanges();
             return Ok(reward);
         }
 
         // ✏️ 4. Cập nhật quà tặng
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Reward updatedReward)
+        public IActionResult Update(int id, [FromBody] Reward updatedReward, [FromQuery] string adminName)
         {
             var reward = _context.Rewards.Find(id);
             if (reward == null) return NotFound("Không tìm thấy quà tặng");
 
+            string oldDetails = $"Tên: {reward.RewardName}, Điểm: {reward.PointsRequired}";
+
             reward.RewardName = updatedReward.RewardName;
             reward.PointsRequired = updatedReward.PointsRequired;
             reward.StockQuantity = updatedReward.StockQuantity;
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Reward",
+                Details = $"Sửa quà #{id}. Cũ: {oldDetails} -> Mới: {reward.RewardName}, {reward.PointsRequired}",
+                CreatedAt = DateTime.UtcNow
+            });
 
             _context.SaveChanges();
             return Ok(reward);
@@ -105,10 +126,19 @@ namespace ASP.NET.Controllers
 
         // ❌ 5. Xóa quà tặng
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string adminName)
         {
             var reward = _context.Rewards.Find(id);
             if (reward == null) return NotFound("Không tìm thấy quà tặng");
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Reward",
+                Details = $"Xóa quà tặng: {reward.RewardName} (ID: {id})",
+                CreatedAt = DateTime.UtcNow
+            });
 
             _context.Rewards.Remove(reward);
             _context.SaveChanges();

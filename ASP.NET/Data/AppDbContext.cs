@@ -21,5 +21,6 @@ namespace ASP.NET.Data
         public DbSet<Store> Stores { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Banner> Banners { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
     }
 }

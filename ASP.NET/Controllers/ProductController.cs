@@ -27,27 +27,38 @@ namespace ASP.NET.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Product product)
+        public IActionResult Create([FromBody] Product product, [FromQuery] string adminName)
         {
             try {
-                // Kiểm tra xem CategoryId có tồn tại không
                 var categoryExists = _context.Categories.Any(c => c.Id == product.CategoryId);
-                if (!categoryExists) return BadRequest("Danh mục (Nhà mạng) không tồn tại. Vui lòng chọn lại.");
+                if (!categoryExists) return BadRequest("Danh mục không tồn tại.");
 
                 product.CreatedAt = DateTime.UtcNow;
                 _context.Products.Add(product);
+                
+                // GHI LOG
+                _context.ActivityLogs.Add(new ActivityLog {
+                    AdminName = adminName ?? "Admin",
+                    Action = "CREATE",
+                    EntityName = "Product",
+                    Details = $"Tạo sản phẩm mới: {product.Name}, Giá: {product.Price}",
+                    CreatedAt = DateTime.UtcNow
+                });
+
                 _context.SaveChanges();
                 return Ok(product);
             } catch (Exception ex) {
-                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product p)
+        public IActionResult Update(int id, [FromBody] Product p, [FromQuery] string adminName)
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
+
+            string oldDetails = $"Tên: {product.Name}, Giá: {product.Price}";
 
             product.Name = p.Name;
             product.Price = p.Price;
@@ -57,20 +68,36 @@ namespace ASP.NET.Controllers
             product.DiscountRate = p.DiscountRate;
             product.IsActive = p.IsActive;
             product.UpdatedAt = DateTime.UtcNow;
+            product.UpdatedBy = adminName ?? "Admin";
 
-            try {
-                _context.SaveChanges();
-                return Ok(product);
-            } catch (Exception ex) {
-                return StatusCode(500, ex.InnerException?.Message ?? ex.Message);
-            }
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Product",
+                Details = $"Sửa sản phẩm #{id}. Cũ: {oldDetails} -> Mới: {product.Name}, {product.Price}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.SaveChanges();
+            return Ok(product);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string adminName)
         {
             var product = _context.Products.Find(id);
             if (product == null) return NotFound();
+            
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Product",
+                Details = $"Xóa sản phẩm: {product.Name} (ID: {id})",
+                CreatedAt = DateTime.UtcNow
+            });
+
             _context.Products.Remove(product);
             _context.SaveChanges();
             return Ok();

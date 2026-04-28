@@ -21,6 +21,7 @@ import Stores from './pages/Stores';
 import Employees from './pages/Employees';
 import PointsHistory from './pages/PointsHistory';
 import CustomerRewards from './pages/CustomerRewards';
+import ActivityLog from './pages/ActivityLog';
 
 // Layouts
 import Sidebar from './components/Sidebar';
@@ -70,6 +71,7 @@ function App() {
         <Route path="/admin/stores" element={<ProtectedRoute><Stores /></ProtectedRoute>} />
         <Route path="/admin/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
         <Route path="/admin/points-history" element={<ProtectedRoute><PointsHistory /></ProtectedRoute>} />
+        <Route path="/admin/activity" element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
