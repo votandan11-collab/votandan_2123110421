@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ASP.NET.Data;
 using ASP.NET.Models;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +53,7 @@ namespace ASP.NET.Controllers
             if (customer == null) return NotFound("Khách hàng không tồn tại");
 
             // Nếu tạo thủ công, mặc định thời gian là hiện tại
-            history.CreatedAt = DateTime.Now;
+            history.CreatedAt = DateTime.UtcNow;
 
             _context.PointsHistories.Add(history);
             _context.SaveChanges();
