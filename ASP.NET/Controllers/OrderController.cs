@@ -95,7 +95,7 @@ namespace ASP.NET.Controllers
                         CustomerId = customer.Id,
                         Points = pointsEarned,
                         Type = "Add",
-                        Description = $"Tích điểm từ đơn hàng #{DateTime.Now.Ticks % 10000}. Hệ số x{multiplier}",
+                        Description = $"Tích điểm từ đơn hàng #{DateTime.UtcNow.Ticks % 10000}. Hệ số x{multiplier}",
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.PointsHistories.Add(pointLog);

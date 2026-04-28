@@ -76,13 +76,35 @@ using (var scope = app.Services.CreateScope())
                     ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 );";
             context.Database.ExecuteSqlRaw(bannerSql);
-        } catch { /* Bỏ qua nếu đã tồn tại */ }
+        } catch { /* Bỏ qua */ }
 
-        // 2. Thêm cột ImageUrl và DiscountRate cho Products
+        // 2. Tạo bảng ActivityLogs
+        try {
+            var logSql = @"
+                CREATE TABLE IF NOT EXISTS ""ActivityLogs"" (
+                    ""Id"" SERIAL PRIMARY KEY,
+                    ""AdminName"" TEXT NOT NULL,
+                    ""Action"" TEXT NOT NULL,
+                    ""EntityName"" TEXT NOT NULL,
+                    ""Details"" TEXT,
+                    ""CreatedAt"" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );";
+            context.Database.ExecuteSqlRaw(logSql);
+        } catch { /* Bỏ qua */ }
+
+        // 3. Cập nhật các cột thiếu cho Products
         try {
             context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"ImageUrl\" TEXT;");
             context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"DiscountRate\" DECIMAL DEFAULT 4;");
-        } catch { /* Bỏ qua nếu đã tồn tại */ }
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"CreatedAt\" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;");
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"UpdatedAt\" TIMESTAMP WITH TIME ZONE;");
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Products\" ADD COLUMN IF NOT EXISTS \"UpdatedBy\" TEXT;");
+        } catch { /* Bỏ qua */ }
+
+        // 4. Cập nhật các cột thiếu cho Rewards
+        try {
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Rewards\" ADD COLUMN IF NOT EXISTS \"StockQuantity\" INTEGER DEFAULT 0;");
+        } catch { /* Bỏ qua */ }
 
         Console.WriteLine("--- DATABASE: Khởi tạo hoàn tất ---");
     }
