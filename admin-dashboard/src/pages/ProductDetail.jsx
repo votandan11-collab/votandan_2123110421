@@ -76,7 +76,6 @@ const ProductDetail = () => {
     }
 
     return (
-  return (
     <div style={{ background: 'var(--bg-dark)', minHeight: '100vh', color: 'white' }}>
       <CustomerHeader user={user} handleLogout={() => setUser(null)} />
 
