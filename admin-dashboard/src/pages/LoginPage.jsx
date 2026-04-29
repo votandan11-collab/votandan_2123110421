@@ -38,113 +38,120 @@ const LoginPage = () => {
         }
     };
 
-    return (
-        <div className="login-container" style={{
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--bg-dark)',
-            padding: '20px'
-        }}>
-            <div className="animate-in" style={{
-                background: 'var(--sidebar-bg)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid var(--glass-border)',
-                borderRadius: '24px',
-                padding: '2.5rem',
-                width: '100%',
-                maxWidth: '400px',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
-            }}>
-                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, var(--primary) 0%, #a855f7 100%)',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1rem',
-                        color: 'white',
-                        boxShadow: '0 8px 16px rgba(99, 102, 241, 0.3)'
-                    }}>
-                        <ShieldCheck size={32} />
-                    </div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white' }}>Loyalty Admin</h1>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        Enter your credentials to access dashboard
-                    </p>
-                </div>
+  return (
+    <div style={{
+      height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: 'var(--bg-dark)', position: 'relative', overflow: 'hidden', padding: '20px'
+    }}>
+      {/* Dynamic Background Elements */}
+      <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', filter: 'blur(80px)' }}></div>
+      <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)', filter: 'blur(80px)' }}></div>
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div style={{ position: 'relative' }}>
-                        <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            className="input-field"
-                            style={{ paddingLeft: '40px' }}
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            className="input-field"
-                            style={{ paddingLeft: '40px' }}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    {error && (
-                        <div style={{ color: '#ef4444', fontSize: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                            {error}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ width: '100%', justifyContent: 'center', height: '45px', marginTop: '0.5rem' }}
-                        disabled={loading}
-                    >
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                            <>
-                                Sign In <ArrowRight size={18} />
-                            </>
-                        )}
-                    </button>
-
-                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        <a href="/" style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textDecoration: 'none', transition: 'var(--transition)' }}
-                            onMouseOver={(e) => e.target.style.color = 'white'}
-                            onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}>
-                            ← Back to Customer Site
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                .animate-spin {
-                    animation: spin 1s linear infinite;
-                }
-            `}} />
+      <div className="animate-slide-in" style={{
+        background: 'rgba(30, 41, 59, 0.4)', backdropFilter: 'blur(25px)',
+        border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '32px',
+        padding: '3.5rem 3rem', width: '100%', maxWidth: '440px',
+        boxShadow: '0 40px 80px rgba(0, 0, 0, 0.5)', position: 'relative', zIndex: 10
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+            width: '72px', height: '72px', borderRadius: '20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 1.5rem', color: 'white',
+            boxShadow: '0 12px 24px rgba(99, 102, 241, 0.3)',
+            transform: 'rotate(-5deg)'
+          }}>
+            <ShieldCheck size={36} />
+          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'white', letterSpacing: '-0.03em' }}>System Access</h1>
+          <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginTop: '0.75rem', fontWeight: 500 }}>
+            Quản trị viên vui lòng đăng nhập để tiếp tục
+          </p>
         </div>
-    );
+
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex', alignItems: 'center' }}>
+                <User size={20} />
+            </div>
+            <input
+              type="text" placeholder="Tên đăng nhập"
+              style={{ 
+                width: '100%', height: '60px', padding: '0 20px 0 56px', 
+                borderRadius: '16px', background: 'rgba(2, 6, 23, 0.4)', 
+                border: '1px solid rgba(255, 255, 255, 0.05)', color: 'white', 
+                fontSize: '1rem', outline: 'none', transition: '0.3s'
+              }}
+              value={username} onChange={(e) => setUsername(e.target.value)} required
+              onFocus={e => e.target.style.borderColor = 'rgba(99, 102, 241, 0.5)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255, 255, 255, 0.05)'}
+            />
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex', alignItems: 'center' }}>
+                <Lock size={20} />
+            </div>
+            <input
+              type="password" placeholder="Mật khẩu"
+              style={{ 
+                width: '100%', height: '60px', padding: '0 20px 0 56px', 
+                borderRadius: '16px', background: 'rgba(2, 6, 23, 0.4)', 
+                border: '1px solid rgba(255, 255, 255, 0.05)', color: 'white', 
+                fontSize: '1rem', outline: 'none', transition: '0.3s'
+              }}
+              value={password} onChange={(e) => setPassword(e.target.value)} required
+              onFocus={e => e.target.style.borderColor = 'rgba(99, 102, 241, 0.5)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255, 255, 255, 0.05)'}
+            />
+          </div>
+
+          {error && (
+            <div style={{ color: '#f43f5e', fontSize: '0.85rem', background: 'rgba(244, 63, 94, 0.1)', padding: '12px 16px', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)', fontWeight: 600 }}>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ 
+              width: '100%', height: '60px', borderRadius: '18px', 
+              background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', 
+              color: 'white', border: 'none', fontWeight: 800, fontSize: '1.1rem', 
+              cursor: 'pointer', boxShadow: '0 12px 24px rgba(99, 102, 241, 0.2)',
+              transition: '0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+            }}
+            onMouseOver={e => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+            onMouseOut={e => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
+          >
+            {loading ? <Loader2 className="animate-spin" size={24} /> : (
+              <>
+                Đăng Nhập <ArrowRight size={20} />
+              </>
+            )}
+          </button>
+
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <Link to="/" style={{ color: '#64748b', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 600, transition: '0.3s' }}
+              onMouseOver={(e) => e.target.style.color = 'white'}
+              onMouseOut={(e) => e.target.style.color = '#64748b'}>
+              ← Quay lại trang chủ
+            </Link>
+          </div>
+        </form>
+      </div>
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-in { animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+      `}} />
+    </div>
+  );
 };
 
 export default LoginPage;

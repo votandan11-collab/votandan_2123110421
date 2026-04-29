@@ -71,68 +71,98 @@ const CustomerRewards = () => {
   };
 
   return (
-    <div style={{ background: '#0f172a', minHeight: '100vh', color: 'white' }}>
+    <div style={{ background: 'var(--bg-dark)', minHeight: '100vh', color: 'white' }}>
       <CustomerHeader user={user} handleLogout={() => { setUser(null); localStorage.removeItem('userData'); }} />
 
-      <main style={{ maxWidth: '1400px', margin: '100px auto', padding: '0 20px' }}>
-        {/* User Stats Card */}
+      <main style={{ maxWidth: '1400px', margin: '120px auto 100px', padding: '0 5%' }}>
+        {/* VIP STATUS CARD */}
         <div style={{ 
-          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-          borderRadius: '24px', padding: '40px', marginBottom: '50px',
-          border: '1px solid rgba(255,255,255,0.1)',
+          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%)',
+          borderRadius: '32px', padding: '48px', marginBottom: '60px',
+          border: '1px solid rgba(255,255,255,0.08)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+          boxShadow: '0 40px 80px rgba(0,0,0,0.4)',
+          position: 'relative', overflow: 'hidden'
         }}>
-          <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '10px' }}>VIP Rewards</h1>
-            <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>Sử dụng điểm tích lũy của bạn để đổi những phần quà hấp dẫn.</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'flex-end', marginBottom: '5px' }}>
-                <Star color="#fbbf24" fill="#fbbf24" size={24} />
-                <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fbbf24' }}>{user?.TotalPoints || 0}</span>
+          <div style={{ position: 'absolute', top: '-50%', right: '-10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)', filter: 'blur(40px)' }}></div>
+          
+          <div style={{ position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', padding: '6px 16px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: 800, marginBottom: '20px', letterSpacing: '0.05em' }}>
+                <Star size={14} fill="currentColor" /> VIP MEMBERSHIP PROGRAM
             </div>
-            <p style={{ color: '#94a3b8', fontWeight: 600 }}>Điểm hiện có của bạn</p>
+            <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '12px', letterSpacing: '-0.04em' }}>Your Rewards</h1>
+            <p style={{ color: '#94a3b8', fontSize: '1.2rem', maxWidth: '500px', lineHeight: '1.6' }}>Sử dụng điểm tích lũy từ mỗi đơn hàng để đổi những phần quà giới hạn và ưu đãi độc quyền.</p>
+          </div>
+          
+          <div style={{ textAlign: 'right', position: 'relative', zIndex: 2 }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '32px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'flex-end', marginBottom: '8px' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Award size={28} />
+                    </div>
+                    <span style={{ fontSize: '3rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '-0.02em' }}>{user?.TotalPoints || 0}</span>
+                </div>
+                <p style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Available Points</p>
+            </div>
           </div>
         </div>
 
-        {/* Rewards Grid */}
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-           <Gift color="#6366f1" /> Danh Sách Quà Tặng
-        </h2>
+        {/* REWARDS GRID */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.03em', display: 'flex', alignItems: 'center', gap: '16px' }}>
+               <Gift color="#6366f1" size={32} /> Quà Tặng Độc Quyền
+            </h2>
+            <div style={{ color: '#64748b', fontWeight: 600 }}>{rewards.length} Phần quà đang mở</div>
+        </div>
 
         {loading ? (
             <div style={{ padding: '100px', textAlign: 'center' }}>
-                <Loader2 className="animate-spin" size={40} color="#6366f1" />
+                <Loader2 className="animate-spin" size={48} color="#6366f1" />
             </div>
         ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '25px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '32px' }}>
                 {rewards.map(reward => (
                     <div key={reward.Id || reward.id} style={{ 
-                        background: 'rgba(30, 41, 59, 0.5)', borderRadius: '20px', 
-                        padding: '25px', border: '1px solid rgba(255,255,255,0.05)',
-                        transition: '0.3s', position: 'relative'
+                        background: 'rgba(255,255,255,0.02)', borderRadius: '28px', 
+                        padding: '32px', border: '1px solid rgba(255,255,255,0.05)',
+                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative',
+                        overflow: 'hidden'
                     }}
-                    onMouseOver={e => e.currentTarget.style.transform = 'translateY(-5px)'}
-                    onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
+                    onMouseOver={e => {
+                        e.currentTarget.style.transform = 'translateY(-10px)';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+                        e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                        e.currentTarget.style.boxShadow = '0 30px 60px rgba(0,0,0,0.4)';
+                    }}
+                    onMouseOut={e => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.boxShadow = 'none';
+                    }}
                     >
                         <div style={{ 
-                            width: '60px', height: '60px', borderRadius: '16px', 
+                            width: '64px', height: '64px', borderRadius: '20px', 
                             background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            marginBottom: '20px'
+                            marginBottom: '28px', boxShadow: '0 10px 20px rgba(99, 102, 241, 0.1)'
                         }}>
-                             <Award size={30} />
+                             <Gift size={32} />
                         </div>
 
-                        <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '10px' }}>{reward.RewardName || reward.rewardName}</h3>
+                        <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '12px', letterSpacing: '-0.02em' }}>{reward.RewardName || reward.rewardName}</h3>
                         
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontWeight: 700 }}>
-                                <Star size={16} fill="#fbbf24" /> {reward.PointsRequired || reward.pointsRequired} Điểm
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontWeight: 800, fontSize: '1.1rem' }}>
+                                <Star size={18} fill="#fbbf24" /> {reward.PointsRequired || reward.pointsRequired}
                             </div>
-                            <div style={{ fontSize: '0.85rem', color: (reward.StockQuantity || reward.stockQuantity) > 0 ? '#4ade80' : '#f87171' }}>
-                                Còn lại: {reward.StockQuantity || reward.stockQuantity}
+                            <div style={{ 
+                                padding: '4px 12px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800,
+                                background: (reward.StockQuantity || reward.stockQuantity) > 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                color: (reward.StockQuantity || reward.stockQuantity) > 0 ? '#10b981' : '#ef4444',
+                                textTransform: 'uppercase', letterSpacing: '0.05em'
+                            }}>
+                                Stock: {reward.StockQuantity || reward.stockQuantity}
                             </div>
                         </div>
 
@@ -140,12 +170,13 @@ const CustomerRewards = () => {
                             disabled={redeeming || (reward.StockQuantity || reward.stockQuantity) <= 0 || (user?.TotalPoints || 0) < (reward.PointsRequired || reward.pointsRequired)}
                             onClick={() => handleRedeem(reward)}
                             style={{ 
-                                width: '100%', padding: '12px', borderRadius: '12px',
-                                background: (reward.StockQuantity || reward.stockQuantity) <= 0 ? '#334155' : 'linear-gradient(135deg, #6366f1, #a855f7)',
-                                color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer',
-                                transition: '0.3s', opacity: (redeeming || (reward.StockQuantity || reward.stockQuantity) <= 0) ? 0.6 : 1
+                                width: '100%', height: '56px', borderRadius: '16px',
+                                background: (reward.StockQuantity || reward.stockQuantity) <= 0 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #6366f1, #a855f7)',
+                                color: 'white', border: 'none', fontWeight: 800, fontSize: '1rem', cursor: 'pointer',
+                                transition: '0.3s', opacity: (redeeming || (reward.StockQuantity || reward.stockQuantity) <= 0) ? 0.5 : 1,
+                                boxShadow: (reward.StockQuantity || reward.stockQuantity) > 0 ? '0 10px 20px rgba(99, 102, 241, 0.2)' : 'none'
                             }}>
-                            {redeeming === (reward.Id || reward.id) ? 'ĐANG XỬ LÝ...' : 'ĐỔI NGAY'}
+                            {redeeming === (reward.Id || reward.id) ? 'PROCESSING...' : 'REDEEM NOW'}
                         </button>
                     </div>
                 ))}
