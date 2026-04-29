@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { rewardApi } from '../api';
+import { rewardApi, customerApi } from '../api';
 import CustomerHeader from '../components/CustomerHeader';
 import CustomerFooter from '../components/CustomerFooter';
 import { Gift, Award, Star, History, Loader2, CheckCircle2 } from 'lucide-react';
@@ -12,10 +12,24 @@ const CustomerRewards = () => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('userData');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        fetchLatestUser(parsedUser.Id || parsedUser.id);
+    }
 
     fetchRewards();
   }, []);
+
+  const fetchLatestUser = async (id) => {
+    try {
+        const res = await customerApi.getById(id);
+        setUser(res.data);
+        localStorage.setItem('userData', JSON.stringify(res.data));
+    } catch (err) {
+        console.error(err);
+    }
+  };
 
   const fetchRewards = async () => {
     try {

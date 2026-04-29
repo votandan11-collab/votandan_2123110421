@@ -1,11 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { User, LogOut, Wallet, ShieldCheck, ChevronDown, Smartphone, Globe, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { categoryApi } from '../api';
+import { categoryApi, customerApi } from '../api';
 
 const CustomerHeader = ({ user, handleLogout }) => {
   const [categories, setCategories] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [liveUser, setLiveUser] = useState(user);
+
+  useEffect(() => {
+    setLiveUser(user);
+    if (user && (user.Id || user.id)) {
+      fetchLatestPoints(user.Id || user.id);
+    }
+  }, [user]);
+
+  const fetchLatestPoints = async (id) => {
+    try {
+      const res = await customerApi.getById(id);
+      setLiveUser(res.data);
+      // Cập nhật lại localStorage để các trang khác cũng có dữ liệu mới
+      localStorage.setItem('userData', JSON.stringify(res.data));
+    } catch (err) {
+      console.error("Không thể cập nhật điểm mới nhất:", err);
+    }
+  };
 
   useEffect(() => {
     categoryApi.getAll().then(res => {
@@ -96,14 +115,14 @@ const CustomerHeader = ({ user, handleLogout }) => {
 
           <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }}></div>
 
-          {user ? (
+          {liveUser ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: 700, fontSize: '0.9rem', color: 'white' }}>{user.Name || user.name}</p>
+                <p style={{ fontWeight: 700, fontSize: '0.9rem', color: 'white' }}>{liveUser.Name || liveUser.name}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>{user.Level || user.level || 'Silver'}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>{liveUser.Level || liveUser.level || 'Silver'}</span>
                   <span style={{ fontSize: '0.75rem', color: '#6366f1' }}>•</span>
-                  <span style={{ fontSize: '0.75rem', color: '#6366f1', fontWeight: 700 }}>{user.TotalPoints || user.totalPoints || 0} pts</span>
+                  <span style={{ fontSize: '0.75rem', color: '#6366f1', fontWeight: 700 }}>{liveUser.TotalPoints || liveUser.totalPoints || 0} pts</span>
                 </div>
               </div>
               <button 
