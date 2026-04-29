@@ -44,7 +44,7 @@ const CustomerRewards = () => {
 
   const handleRedeem = async (reward) => {
     if (!user) return alert('Vui lòng đăng nhập để đổi quà!');
-    if (user.TotalPoints < reward.PointsRequired) return alert('Bạn không đủ điểm!');
+    if ((user.TotalPoints || user.totalPoints || 0) < (reward.PointsRequired || reward.pointsRequired)) return alert('Bạn không đủ điểm!');
 
     if (!window.confirm(`Bạn có chắc muốn dùng ${reward.PointsRequired} điểm để đổi "${reward.RewardName}"?`)) return;
 
@@ -100,7 +100,7 @@ const CustomerRewards = () => {
                     <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Award size={28} />
                     </div>
-                    <span style={{ fontSize: '3rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '-0.02em' }}>{user?.TotalPoints || 0}</span>
+                    <span style={{ fontSize: '3rem', fontWeight: 900, color: '#fbbf24', letterSpacing: '-0.02em' }}>{user?.TotalPoints || user?.totalPoints || 0}</span>
                 </div>
                 <p style={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Available Points</p>
             </div>
@@ -167,7 +167,7 @@ const CustomerRewards = () => {
                         </div>
 
                         <button 
-                            disabled={redeeming || (reward.StockQuantity || reward.stockQuantity) <= 0 || (user?.TotalPoints || 0) < (reward.PointsRequired || reward.pointsRequired)}
+                            disabled={redeeming || (reward.StockQuantity || reward.stockQuantity) <= 0 || (user?.TotalPoints || user?.totalPoints || 0) < (reward.PointsRequired || reward.pointsRequired)}
                             onClick={() => handleRedeem(reward)}
                             style={{ 
                                 width: '100%', height: '56px', borderRadius: '16px',
