@@ -23,9 +23,9 @@ export const productApi = {
 
 export const categoryApi = {
   getAll: () => api.get('/Categories'),
-  create: (data) => api.post('/Categories', data),
-  update: (id, data) => api.put(`/Categories/${id}`, data),
-  delete: (id) => api.delete(`/Categories/${id}`),
+  create: (data, adminName) => api.post(`/Categories?adminName=${adminName || 'Admin'}`, data),
+  update: (id, data, adminName) => api.put(`/Categories/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Categories/${id}?adminName=${adminName || 'Admin'}`),
 };
 
 export const customerApi = {
@@ -43,16 +43,16 @@ export const orderApi = {
   getById: (id) => api.get(`/Order/${id}`),
   getByCustomerId: (customerId) => api.get(`/Order/customer/${customerId}`),
   create: (data) => api.post('/Order', data),
-  update: (id, data, adminName) => api.put(`/Order/${id}?adminName=${adminName}`, data),
-  delete: (id) => api.delete(`/Order/${id}`),
+  update: (id, data, adminName) => api.put(`/Order/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Order/${id}?adminName=${adminName || 'Admin'}`),
 };
 
 export const rewardApi = {
   getAll: () => api.get('/Rewards'),
-  create: (data) => api.post('/Rewards', data),
+  create: (data, adminName) => api.post(`/Rewards?adminName=${adminName || 'Admin'}`, data),
   redeem: (data) => api.post('/Rewards/redeem', data), // data: { CustomerId: x, RewardId: y }
-  update: (id, data) => api.put(`/Rewards/${id}`, data),
-  delete: (id) => api.delete(`/Rewards/${id}`),
+  update: (id, data, adminName) => api.put(`/Rewards/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Rewards/${id}?adminName=${adminName || 'Admin'}`),
 };
 
 export const pointsHistoryApi = {
@@ -62,16 +62,16 @@ export const pointsHistoryApi = {
 
 export const storeApi = {
   getAll: () => api.get('/Stores'),
-  create: (data) => api.post('/Stores', data),
-  update: (id, data) => api.put(`/Stores/${id}`, data),
-  delete: (id) => api.delete(`/Stores/${id}`),
+  create: (data, adminName) => api.post(`/Stores?adminName=${adminName || 'Admin'}`, data),
+  update: (id, data, adminName) => api.put(`/Stores/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Stores/${id}?adminName=${adminName || 'Admin'}`),
 };
 
 export const employeeApi = {
   getAll: () => api.get('/Employees'),
-  create: (data) => api.post('/Employees', data),
-  update: (id, data) => api.put(`/Employees/${id}`, data),
-  delete: (id) => api.delete(`/Employees/${id}`),
+  create: (data, adminName) => api.post(`/Employees?adminName=${adminName || 'Admin'}`, data),
+  update: (id, data, adminName) => api.put(`/Employees/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Employees/${id}?adminName=${adminName || 'Admin'}`),
   login: (data) => api.post('/Employees/login', data),
 };
 
@@ -87,9 +87,9 @@ export const paymentApi = {
 export const bannerApi = {
     getAll: () => api.get(`/Banners`),
     getAdmin: () => api.get(`/Banners/admin`),
-    create: (data) => api.post(`/Banners`, data),
-    update: (id, data) => api.put(`/Banners/${id}`, data),
-    delete: (id) => api.delete(`/Banners/${id}`)
+    create: (data, adminName) => api.post(`/Banners?adminName=${adminName || 'Admin'}`, data),
+    update: (id, data, adminName) => api.put(`/Banners/${id}?adminName=${adminName || 'Admin'}`, data),
+    delete: (id, adminName) => api.delete(`/Banners/${id}?adminName=${adminName || 'Admin'}`)
 };
 
 export default api;

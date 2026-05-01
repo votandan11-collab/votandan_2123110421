@@ -34,10 +34,13 @@ const Categories = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         try {
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+
             if (editingId) {
-                await categoryApi.update(editingId, { ...formData, id: editingId });
+                await categoryApi.update(editingId, { ...formData, id: editingId }, adminName);
             } else {
-                await categoryApi.create(formData);
+                await categoryApi.create(formData, adminName);
             }
             setShowForm(false);
             setEditingId(null);
@@ -51,7 +54,9 @@ const Categories = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Xác nhận xóa danh mục này? Lưu ý: Nếu có sản phẩm trong danh mục này, bạn không thể xóa.')) {
             try {
-                await categoryApi.delete(id);
+                const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+                const adminName = admin.fullName || 'Admin';
+                await categoryApi.delete(id, adminName);
                 fetchCategories();
             } catch (error) {
                 alert('Không thể xóa danh mục này. Hãy đảm bảo danh mục đang trống (không có sản phẩm nào thuộc danh mục này).');

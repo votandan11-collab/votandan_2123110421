@@ -20,32 +20,62 @@ namespace ASP.NET.Controllers
         public async Task<IActionResult> GetAll() => Ok(await _context.Employees.ToListAsync());
 
         [HttpPost]
-        public async Task<IActionResult> Create(Employee emp)
+        public async Task<IActionResult> Create(Employee emp, [FromQuery] string? adminName = null)
         {
             _context.Employees.Add(emp);
+            
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "CREATE",
+                EntityName = "Employee",
+                Details = $"Thêm nhân viên mới: {emp.FullName} ({emp.Username})",
+                CreatedAt = System.DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
             return Ok(new { Message = "Thêm nhân viên thành công", User = emp.Username });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Employee emp)
+        public async Task<IActionResult> Update(int id, Employee emp, [FromQuery] string? adminName = null)
         {
             var exist = await _context.Employees.FindAsync(id);
             if (exist == null) return NotFound();
 
+            string oldName = exist.FullName;
             exist.FullName = emp.FullName;
             exist.Role = emp.Role;
-            exist.Password = emp.Password; // Trong thực tế nên mã hóa mật khẩu
+            exist.Password = emp.Password;
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Employee",
+                Details = $"Cập nhật nhân viên #{id}. Cũ: {oldName} -> Mới: {exist.FullName}",
+                CreatedAt = System.DateTime.UtcNow
+            });
 
             await _context.SaveChangesAsync();
             return Ok("Cập nhật thông tin nhân viên thành công");
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromQuery] string? adminName = null)
         {
             var emp = await _context.Employees.FindAsync(id);
             if (emp == null) return NotFound();
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Employee",
+                Details = $"Xóa nhân viên: {emp.FullName} (Username: {emp.Username})",
+                CreatedAt = System.DateTime.UtcNow
+            });
+
             _context.Employees.Remove(emp);
             await _context.SaveChangesAsync();
             return Ok("Đã xóa nhân viên");

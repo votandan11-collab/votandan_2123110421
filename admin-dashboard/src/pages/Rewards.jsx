@@ -48,7 +48,9 @@ const Rewards = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this reward?')) return;
         try {
-            await rewardApi.delete(id);
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+            await rewardApi.delete(id, adminName);
             fetchRewards();
         } catch (error) {
             alert('Error deleting reward');
@@ -58,6 +60,9 @@ const Rewards = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+
             // Chuẩn hóa dữ liệu sang PascalCase cho backend
             const payload = {
                 RewardName: formData.rewardName,
@@ -66,9 +71,9 @@ const Rewards = () => {
             };
 
             if (editingReward) {
-                await rewardApi.update(editingReward.id || editingReward.Id, payload);
+                await rewardApi.update(editingReward.id || editingReward.Id, payload, adminName);
             } else {
-                await rewardApi.create(payload);
+                await rewardApi.create(payload, adminName);
             }
             setShowModal(false);
             fetchRewards();

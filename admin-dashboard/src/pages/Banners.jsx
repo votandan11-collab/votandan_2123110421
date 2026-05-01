@@ -27,10 +27,13 @@ const Banners = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         try {
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+
             if (editingId) {
-                await bannerApi.update(editingId, { ...editForm, id: editingId });
+                await bannerApi.update(editingId, { ...editForm, id: editingId }, adminName);
             } else {
-                await bannerApi.create(editForm);
+                await bannerApi.create(editForm, adminName);
             }
             fetchBanners();
             setShowAdd(false);
@@ -43,7 +46,9 @@ const Banners = () => {
 
     const handleDelete = async (id) => {
         if (window.confirm('Xóa ảnh banner này?')) {
-            await bannerApi.delete(id);
+            const admin = JSON.parse(localStorage.getItem('adminUser') || '{}');
+            const adminName = admin.fullName || 'Admin';
+            await bannerApi.delete(id, adminName);
             fetchBanners();
         }
     };

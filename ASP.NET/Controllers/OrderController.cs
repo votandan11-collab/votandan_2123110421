@@ -137,13 +137,21 @@ namespace ASP.NET.Controllers
             var order = _context.Orders.Find(id);
             if (order == null) return NotFound("Đơn hàng không tồn tại");
 
-            // Chỉ cho phép cập nhật số tiền hoặc mã khách hàng (nếu sai sót)
+            string oldDetails = $"Tiền: {order.TotalAmount}, Khách: {order.CustomerId}";
+            
             order.TotalAmount = updatedOrder.TotalAmount;
             order.CustomerId = updatedOrder.CustomerId;
-
-            // Ghi lại dấu vết chỉnh sửa
             order.UpdatedAt = DateTime.UtcNow;
-            order.UpdatedBy = string.IsNullOrEmpty(adminName) ? "Admin_Anonymous" : adminName;
+            order.UpdatedBy = adminName ?? "Admin";
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Order",
+                Details = $"Sửa đơn hàng #{id}. Cũ: {oldDetails} -> Mới: Tiền {order.TotalAmount}, Khách {order.CustomerId}",
+                CreatedAt = DateTime.UtcNow
+            });
 
             _context.SaveChanges();
 
@@ -157,10 +165,19 @@ namespace ASP.NET.Controllers
 
         // ❌ 6. XÓA ĐƠN HÀNG
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string? adminName = null)
         {
             var order = _context.Orders.Find(id);
             if (order == null) return NotFound("Đơn hàng đã xóa hoặc không tồn tại");
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Order",
+                Details = $"Xóa đơn hàng #{id} (Số tiền: {order.TotalAmount})",
+                CreatedAt = DateTime.UtcNow
+            });
 
             _context.Orders.Remove(order);
             _context.SaveChanges();

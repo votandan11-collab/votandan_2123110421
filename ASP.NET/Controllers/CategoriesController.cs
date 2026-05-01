@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ASP.NET.Data;
 using ASP.NET.Models;
 using Microsoft.EntityFrameworkCore;
@@ -34,44 +34,71 @@ namespace ASP.NET.Controllers
             return Ok(category);
         }
 
-        // ➕ THÊM DANH MỤC MỚI (Ví dụ: Trà sữa, Cà phê, Đá xay)
+        // ➕ THÊM DANH MỤC MỚI
         [HttpPost]
-        public IActionResult Create([FromBody] Category category)
+        public IActionResult Create([FromBody] Category category, [FromQuery] string? adminName = null)
         {
             if (string.IsNullOrEmpty(category.Name))
                 return BadRequest("Tên danh mục không được để trống");
 
             _context.Categories.Add(category);
+            
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "CREATE",
+                EntityName = "Category",
+                Details = $"Tạo danh mục mới: {category.Name}",
+                CreatedAt = System.DateTime.UtcNow
+            });
+
             _context.SaveChanges();
             return Ok(category);
         }
 
         // ✏️ CẬP NHẬT DANH MỤC
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Category updatedCategory)
+        public IActionResult Update(int id, [FromBody] Category updatedCategory, [FromQuery] string? adminName = null)
         {
             var category = _context.Categories.Find(id);
             if (category == null) return NotFound();
 
+            string oldName = category.Name;
             category.Name = updatedCategory.Name;
             category.Description = updatedCategory.Description;
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Category",
+                Details = $"Sửa danh mục #{id}. Cũ: {oldName} -> Mới: {category.Name}",
+                CreatedAt = System.DateTime.UtcNow
+            });
 
             _context.SaveChanges();
             return Ok(category);
         }
 
-        // ❌ XÓA DANH MỤC (Có kiểm tra nghiệp vụ)
+        // ❌ XÓA DANH MỤC
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string? adminName = null)
         {
             var category = _context.Categories.Find(id);
             if (category == null) return NotFound();
 
-            // NGHIỆP VỤ: Nếu đang có sản phẩm thuộc danh mục này thì không cho xóa
-            // Điều này giúp tránh lỗi dữ liệu "mồ côi" trong Database
             var hasProducts = _context.Products.Any(p => p.CategoryId == id);
             if (hasProducts)
                 return BadRequest("Không thể xóa! Danh mục này hiện đang chứa sản phẩm.");
+
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Category",
+                Details = $"Xóa danh mục: {category.Name} (ID: {id})",
+                CreatedAt = System.DateTime.UtcNow
+            });
 
             _context.Categories.Remove(category);
             _context.SaveChanges();
