@@ -33,9 +33,11 @@ const Employees = () => {
             const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
             const response = await axios.get(`${API_BASE_URL}/ActivityLogs`);
             // Filter logs for this specific employee by name
-            const filtered = response.data.filter(log => 
-                log.adminName.toLowerCase() === emp.fullName.toLowerCase()
-            );
+            const filtered = response.data.filter(log => {
+                const logAdmin = log.adminName || log.AdminName || '';
+                const empName = emp.fullName || '';
+                return logAdmin.toLowerCase() === empName.toLowerCase();
+            });
             setActivityLogs(filtered);
         } catch (error) {
             console.error('Error fetching logs:', error);

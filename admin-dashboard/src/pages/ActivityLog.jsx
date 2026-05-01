@@ -34,9 +34,9 @@ const ActivityLog = () => {
 
     const filteredLogs = logs.filter(log => {
         const matchesSearch = 
-            log.adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.entityName.toLowerCase().includes(searchTerm.toLowerCase());
+            (log.adminName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (log.details || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (log.entityName || '').toLowerCase().includes(searchTerm.toLowerCase());
         
         const matchesAction = filterAction === 'ALL' || log.action === filterAction;
         
