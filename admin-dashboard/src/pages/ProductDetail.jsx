@@ -16,6 +16,10 @@ const ProductDetail = () => {
     const [cart, setCart] = useState([]);
     const [email, setEmail] = useState('');
     const [showQR, setShowQR] = useState(false);
+    
+    // Coupon State
+    const [couponInput, setCouponInput] = useState('');
+    const [activeCoupon, setActiveCoupon] = useState(null);
 
     useEffect(() => {
         const savedUser = localStorage.getItem('userData');
@@ -46,6 +50,18 @@ const ProductDetail = () => {
         loadData();
     }, [categoryId]);
 
+    const handleApplyCoupon = () => {
+        const redeemedCoupons = JSON.parse(localStorage.getItem('redeemedCoupons') || '[]');
+        const found = redeemedCoupons.find(c => c.code === couponInput.trim() && !c.used);
+        
+        if (found) {
+            setActiveCoupon(found);
+            alert(`Đã áp dụng mã giảm giá ${found.discount}% thành công!`);
+        } else {
+            alert('Mã giảm giá không hợp lệ hoặc đã được sử dụng.');
+        }
+    };
+
     const addToCart = (product) => {
         setCart(prev => {
             const existing = prev.find(item => (item.product.Id || item.product.id) === (product.Id || product.id));
@@ -75,11 +91,16 @@ const ProductDetail = () => {
     };
 
     const calculateTotal = () => {
-        return cart.reduce((sum, item) => {
+        const subtotal = cart.reduce((sum, item) => {
             const price = item.product.Price || item.product.price || 0;
             const discount = item.product.DiscountRate || item.product.discountRate || 4;
             return sum + (price * item.quantity * (1 - discount/100));
         }, 0);
+
+        if (activeCoupon) {
+            return subtotal * (1 - activeCoupon.discount / 100);
+        }
+        return subtotal;
     };
 
     const handleCheckout = () => {
@@ -98,12 +119,22 @@ const ProductDetail = () => {
             const orderData = { 
                 CustomerId: user?.Id || user?.id || 0,
                 TotalAmount: totalAmount,
-                UpdatedBy: `Mua: [${itemsDescription}] - Email: ${email}`
+                UpdatedBy: `Mua: [${itemsDescription}] ${activeCoupon ? ` - Coupon: ${activeCoupon.code}` : ''} - Email: ${email}`
             };
             
             await orderApi.create(orderData);
+            
+            // Mark coupon as used
+            if (activeCoupon) {
+                const redeemedCoupons = JSON.parse(localStorage.getItem('redeemedCoupons') || '[]');
+                const updated = redeemedCoupons.map(c => c.code === activeCoupon.code ? { ...c, used: true } : c);
+                localStorage.setItem('redeemedCoupons', JSON.stringify(updated));
+            }
+
             alert(`Mua thẻ thành công! Hệ thống đang kiểm duyệt thanh toán cho các thẻ: ${itemsDescription}.`);
             setCart([]);
+            setActiveCoupon(null);
+            setCouponInput('');
             setShowQR(false);
         } catch (error) {
             console.error('Order error:', error.response?.data || error.message);
@@ -125,7 +156,7 @@ const ProductDetail = () => {
             <div>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.03em' }}>Thẻ {category?.name}</h2>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '1rem', fontWeight: 600 }}>
-                    <Zap size={16} fill="#fbbf24" color="#fbbf24" /> Chọn nhiều mệnh giá để mua cùng lúc
+                    <Zap size={16} fill="#fbbf24" color="#fbbf24" /> Dùng điểm đổi Coupon để nhận thêm ưu đãi
                 </div>
             </div>
           </div>
@@ -217,6 +248,29 @@ const ProductDetail = () => {
                             value={email} onChange={e => setEmail(e.target.value)}
                             style={{ width: '100%', height: '52px', padding: '0 16px', borderRadius: '14px', background: 'rgba(2, 6, 23, 0.4)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', outline: 'none', marginBottom: '12px' }}
                         />
+                        
+                        {/* COUPON INPUT */}
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                            <input 
+                                type="text" placeholder="Nhập mã Coupon..." 
+                                value={couponInput} onChange={e => setCouponInput(e.target.value)}
+                                style={{ flex: 1, height: '48px', padding: '0 16px', borderRadius: '12px', background: 'rgba(2, 6, 23, 0.4)', border: '1px solid rgba(255,255,255,0.05)', color: 'white', outline: 'none', fontSize: '0.85rem' }}
+                            />
+                            <button 
+                                onClick={handleApplyCoupon}
+                                style={{ padding: '0 16px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.2)', color: '#6366f1', border: '1px solid rgba(99, 102, 241, 0.4)', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+                            >
+                                Áp dụng
+                            </button>
+                        </div>
+
+                        {activeCoupon && (
+                            <div style={{ padding: '10px 16px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10b981', fontSize: '0.8rem', fontWeight: 700, marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+                                <span>Giảm giá Coupon:</span>
+                                <span>-{activeCoupon.discount}%</span>
+                            </div>
+                        )}
+
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                             <span style={{ color: '#94a3b8', fontWeight: 600 }}>Tổng thanh toán:</span>
                             <span style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fbbf24' }}>{calculateTotal().toLocaleString()}đ</span>
