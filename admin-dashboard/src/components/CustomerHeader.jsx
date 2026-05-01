@@ -112,6 +112,15 @@ const CustomerHeader = ({ user, handleLogout }) => {
                   <span style={{ fontSize: '0.75rem', color: '#6366f1', fontWeight: 800 }}>{liveUser.TotalPoints || liveUser.totalPoints || 0} pts</span>
                 </div>
               </div>
+              
+              <Link to="/profile" style={{ 
+                  background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', 
+                  width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' 
+              }} onMouseOver={e => e.currentTarget.style.background = 'rgba(99, 102, 241, 0.2)'} onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+                  <User size={18} />
+              </Link>
+
               <button onClick={handleLogout} style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: 'none', width: '36px', height: '36px', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LogOut size={16} /></button>
             </div>
           ) : (

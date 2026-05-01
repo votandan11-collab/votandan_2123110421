@@ -22,6 +22,7 @@ import Employees from './pages/Employees';
 import PointsHistory from './pages/PointsHistory';
 import CustomerRewards from './pages/CustomerRewards';
 import ActivityLog from './pages/ActivityLog';
+import CustomerProfile from './pages/CustomerProfile';
 
 // Layouts
 import Sidebar from './components/Sidebar';
@@ -51,6 +52,7 @@ function App() {
         <Route path="/" element={<CustomerHome />} />
         <Route path="/buy/:categoryId" element={<ProductDetail />} />
         <Route path="/rewards" element={<CustomerRewards />} />
+        <Route path="/profile" element={<CustomerProfile />} />
         
         {/* ĐĂNG NHẬP / ĐĂNG KÝ USER */}
         <Route path="/customer-login" element={<CustomerLogin />} />
