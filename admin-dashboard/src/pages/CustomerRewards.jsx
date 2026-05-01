@@ -57,19 +57,24 @@ const CustomerRewards = () => {
       
       alert(res.data.Message);
       
-      // If it's a coupon, save it to local storage for later use
-      if (reward.RewardName.toLowerCase().includes('coupon')) {
-          const redeemedCoupons = JSON.parse(localStorage.getItem('redeemedCoupons') || '[]');
-          const newCoupon = {
-              id: Date.now(),
-              name: reward.RewardName,
-              discount: parseInt(reward.RewardName.match(/\d+/)?.[0] || '10'),
-              code: `VTD-${reward.RewardName.replace(/\s+/g, '').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-              used: false
-          };
-          redeemedCoupons.push(newCoupon);
-          localStorage.setItem('redeemedCoupons', JSON.stringify(redeemedCoupons));
-          alert(`Chúc mừng! Bạn nhận được mã giảm giá: ${newCoupon.code}. Bạn có thể dùng mã này ở trang thanh toán.`);
+      // Save ALL redeemed items to local storage so user can see them in Profile
+      const redeemedCoupons = JSON.parse(localStorage.getItem('redeemedCoupons') || '[]');
+      const discountMatch = reward.RewardName.match(/\d+/);
+      const newCoupon = {
+          id: Date.now(),
+          name: reward.RewardName,
+          discount: discountMatch ? parseInt(discountMatch[0]) : 0, // 0 if it's a physical gift/special reward
+          code: `VTD-${reward.RewardName.replace(/\s+/g, '').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+          used: false,
+          type: discountMatch ? 'DISCOUNT' : 'GIFT'
+      };
+      redeemedCoupons.push(newCoupon);
+      localStorage.setItem('redeemedCoupons', JSON.stringify(redeemedCoupons));
+      
+      if (newCoupon.type === 'DISCOUNT') {
+          alert(`Chúc mừng! Bạn nhận được mã giảm giá: ${newCoupon.code}. Xem chi tiết tại Trang cá nhân.`);
+      } else {
+          alert(`Đổi quà thành công! Mã nhận quà của bạn là: ${newCoupon.code}. Vui lòng liên hệ Admin để nhận quà.`);
       }
       
       // Update local points
