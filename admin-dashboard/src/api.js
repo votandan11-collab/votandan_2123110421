@@ -31,9 +31,9 @@ export const categoryApi = {
 export const customerApi = {
   getAll: () => api.get('/Customers'),
   getById: (id) => api.get(`/Customers/${id}`),
-  create: (data) => api.post('/Customers', data),
-  update: (id, data) => api.put(`/Customers/${id}`, data),
-  delete: (id) => api.delete(`/Customers/${id}`),
+  create: (data, adminName) => api.post(`/Customers?adminName=${adminName || 'Admin'}`, data),
+  update: (id, data, adminName) => api.put(`/Customers/${id}?adminName=${adminName || 'Admin'}`, data),
+  delete: (id, adminName) => api.delete(`/Customers/${id}?adminName=${adminName || 'Admin'}`),
   login: (data) => api.post('/Customers/login', data),
   register: (data) => api.post('/Customers/register', data),
 };

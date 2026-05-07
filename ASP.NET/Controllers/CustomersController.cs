@@ -33,42 +33,68 @@ namespace ASP.NET.Controllers
 
         // ➕ CREATE
         [HttpPost]
-        public IActionResult Create(Customer customer)
+        public IActionResult Create(Customer customer, [FromQuery] string? adminName = null)
         {
             customer.TotalPoints = 0;
             customer.Level = "Normal";
 
             _context.Customers.Add(customer);
-            _context.SaveChanges();
 
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "CREATE",
+                EntityName = "Customer",
+                Details = $"Thêm khách hàng mới: {customer.Name} ({customer.Email})",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.SaveChanges();
             return Ok(customer);
         }
 
         // ✏️ UPDATE
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Customer c)
+        public IActionResult Update(int id, Customer c, [FromQuery] string? adminName = null)
         {
             var customer = _context.Customers.Find(id);
             if (customer == null) return NotFound();
 
+            string oldInfo = $"{customer.Name} ({customer.Email})";
             customer.Name = c.Name;
             customer.Email = c.Email;
 
-            _context.SaveChanges();
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "UPDATE",
+                EntityName = "Customer",
+                Details = $"Sửa khách hàng #{id}. Cũ: {oldInfo} -> Mới: {customer.Name} ({customer.Email})",
+                CreatedAt = DateTime.UtcNow
+            });
 
+            _context.SaveChanges();
             return Ok(customer);
         }
 
         // ❌ DELETE
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string? adminName = null)
         {
             var customer = _context.Customers.Find(id);
             if (customer == null) return NotFound();
 
+            // GHI LOG
+            _context.ActivityLogs.Add(new ActivityLog {
+                AdminName = adminName ?? "Admin",
+                Action = "DELETE",
+                EntityName = "Customer",
+                Details = $"Xóa khách hàng: {customer.Name} ({customer.Email}) (ID: {id})",
+                CreatedAt = DateTime.UtcNow
+            });
+
             _context.Customers.Remove(customer);
             _context.SaveChanges();
-
             return Ok("Xóa thành công");
         }
 
