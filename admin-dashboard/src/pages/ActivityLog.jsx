@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, User, Terminal, RefreshCw, Wifi, WifiOff } from 'lucide-react';
-import axios from 'axios';
+import api from '../api';
 
 const POLL_INTERVAL = 5000; // 5 giây
 
@@ -15,12 +15,10 @@ const ActivityLog = () => {
     const prevLogIdsRef = useRef(new Set());
     const intervalRef = useRef(null);
 
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-
     const fetchLogs = async (isInitial = false) => {
         try {
             if (isInitial) setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/ActivityLogs`);
+            const response = await api.get('/ActivityLogs');
             const fetched = response.data;
 
             // Tìm các log mới (chưa có trong lần fetch trước)
