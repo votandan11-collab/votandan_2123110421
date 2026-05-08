@@ -46,7 +46,7 @@ namespace ASP.NET.Services
                 mailMessage.To.Add(toEmail);
 
                 try {
-                    await client.SendTaskAsync(mailMessage);
+                    await client.SendMailAsync(mailMessage);
                 } catch (Exception ex) {
                     Console.WriteLine($"SMTP ERROR: {ex.Message}");
                     throw new Exception("Không thể kết nối đến máy chủ Email. Vui lòng kiểm tra lại cấu hình Gmail.");
