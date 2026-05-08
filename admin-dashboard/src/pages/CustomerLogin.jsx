@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { customerApi } from '../api';
 import CustomerHeader from '../components/CustomerHeader';
 import CustomerFooter from '../components/CustomerFooter';
-import { Mail, Lock, User, LogIn, UserPlus, KeyRound } from 'lucide-react';
+import { Mail, Lock, User, LogIn, UserPlus, KeyRound, ShieldCheck } from 'lucide-react';
 
 const CustomerLogin = () => {
-  const [mode, setMode] = useState('login'); // 'login', 'register', 'forgot'
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [mode, setMode] = useState('login'); // 'login', 'register', 'forgot', 'reset'
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', code: '', newPassword: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -28,15 +28,19 @@ const CustomerLogin = () => {
         await customerApi.register(formData);
         alert('Đăng ký thành công! Vui lòng đăng nhập.');
         setMode('login');
-        setFormData({ name: '', email: '', password: '' });
+        setFormData({ name: '', email: '', password: '', code: '', newPassword: '' });
       } else if (mode === 'forgot') {
         const res = await customerApi.forgotPassword({ email: formData.email });
         setSuccess(res.data.message);
-        // Sau 3 giây tự chuyển về login
-        setTimeout(() => {
-            setMode('login');
-            setSuccess('');
-        }, 3000);
+        setMode('reset'); // Chuyển sang bước nhập mã OTP
+      } else if (mode === 'reset') {
+        const res = await customerApi.resetPassword({ 
+            email: formData.email, 
+            code: formData.code, 
+            newPassword: formData.newPassword 
+        });
+        setSuccess(res.data.message);
+        setTimeout(() => setMode('login'), 2000);
       }
     } catch (err) {
       const errData = err.response?.data;
@@ -66,10 +70,14 @@ const CustomerLogin = () => {
               {mode === 'login' ? <LogIn size={30} /> : mode === 'register' ? <UserPlus size={30} /> : <KeyRound size={30} />}
             </div>
             <h2 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>
-              {mode === 'login' ? 'Chào Mừng Trở Lại!' : mode === 'register' ? 'Tạo Tài Khoản' : 'Khôi Phục Mật Khẩu'}
+              {mode === 'login' ? 'Chào Mừng Trở Lại!' : 
+               mode === 'register' ? 'Tạo Tài Khoản' : 
+               mode === 'forgot' ? 'Quên Mật Khẩu' : 'Nhập Mã Xác Nhận'}
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.95rem' }}>
-              {mode === 'login' ? 'Đăng nhập để mua thẻ nạp giá rẻ' : mode === 'register' ? 'Đăng ký miễn phí để nhận ưu đãi' : 'Nhập email để nhận mật khẩu mới'}
+              {mode === 'login' ? 'Đăng nhập để mua thẻ nạp giá rẻ' : 
+               mode === 'register' ? 'Đăng ký miễn phí để nhận ưu đãi' : 
+               mode === 'forgot' ? 'Nhập email để nhận mã OTP' : 'Kiểm tra Gmail để lấy mã 6 số'}
             </p>
           </div>
 
@@ -102,6 +110,7 @@ const CustomerLogin = () => {
               </div>
             )}
 
+            {/* Email field (luôn hiện, trừ khi ở bước reset vì đã có email từ bước trước) */}
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>Email</label>
               <div style={{ position: 'relative' }}>
@@ -115,7 +124,37 @@ const CustomerLogin = () => {
               </div>
             </div>
 
-            {mode !== 'forgot' && (
+            {/* Bước Reset: Nhập mã OTP và Mật khẩu mới */}
+            {mode === 'reset' && (
+              <>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>Mã xác nhận (OTP)</label>
+                  <div style={{ position: 'relative' }}>
+                    <ShieldCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <input 
+                      type="text" placeholder="Nhập 6 số" 
+                      value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})}
+                      style={{ width: '100%', padding: '13px 15px 13px 44px', borderRadius: '10px', border: '2px solid #e2e8f0', fontSize: '0.95rem', transition: '0.2s', outline: 'none', letterSpacing: '4px', fontWeight: 'bold' }}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>Mật khẩu mới</label>
+                  <div style={{ position: 'relative' }}>
+                    <Lock size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <input 
+                      type="password" placeholder="Nhập mật khẩu mới" 
+                      value={formData.newPassword} onChange={e => setFormData({...formData, newPassword: e.target.value})}
+                      style={{ width: '100%', padding: '13px 15px 13px 44px', borderRadius: '10px', border: '2px solid #e2e8f0', fontSize: '0.95rem', transition: '0.2s', outline: 'none' }}
+                      required
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {(mode === 'login' || mode === 'register') && (
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155', fontSize: '0.9rem' }}>Mật khẩu</label>
                 <div style={{ position: 'relative' }}>
@@ -151,7 +190,10 @@ const CustomerLogin = () => {
                 boxShadow: '0 4px 15px rgba(102,126,234,0.4)', transition: '0.2s',
                 opacity: loading ? 0.7 : 1
               }}>
-              {loading ? 'Đang xử lý...' : (mode === 'login' ? 'Đăng Nhập' : mode === 'register' ? 'Đăng Ký' : 'Gửi Yêu Cầu')}
+              {loading ? 'Đang xử lý...' : 
+               mode === 'login' ? 'Đăng Nhập' : 
+               mode === 'register' ? 'Đăng Ký' : 
+               mode === 'forgot' ? 'Gửi Mã OTP' : 'Xác Nhận Đổi Mật Khẩu'}
             </button>
           </form>
 
@@ -159,7 +201,11 @@ const CustomerLogin = () => {
           <div style={{ textAlign: 'center', marginTop: '28px', color: '#64748b', fontSize: '0.95rem' }}>
             {mode === 'login' ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
             <span 
-              onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setFormData({ name: '', email: '', password: '' }); setError(''); setSuccess(''); }}
+              onClick={() => { 
+                  setMode(mode === 'login' ? 'register' : 'login'); 
+                  setFormData({ name: '', email: '', password: '', code: '', newPassword: '' }); 
+                  setError(''); setSuccess(''); 
+              }}
               style={{ color: '#667eea', fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}
             >
               {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập'}

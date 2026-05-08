@@ -37,6 +37,7 @@ export const customerApi = {
   login: (data) => api.post('/Customers/login', data),
   register: (data) => api.post('/Customers/register', data),
   forgotPassword: (data) => api.post('/Customers/forgot-password', data),
+  resetPassword: (data) => api.post('/Customers/reset-password', data),
 };
 
 export const orderApi = {

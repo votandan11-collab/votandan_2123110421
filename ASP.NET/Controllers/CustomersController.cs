@@ -140,7 +140,7 @@ namespace ASP.NET.Controllers
             });
         }
         
-        // 🔑 FORGOT PASSWORD
+        // 🔑 1. GỬI MÃ OTP QUÊN MẬT KHẨU
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
@@ -151,35 +151,65 @@ namespace ASP.NET.Controllers
             if (user == null) 
                 return NotFound("Email không tồn tại trong hệ thống");
 
-            // Tạo mật khẩu tạm thời ngẫu nhiên (6 ký tự)
-            string tempPassword = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
-            user.Password = tempPassword; // Trong thực tế nên dùng Token và Reset Link, nhưng đây là cách nhanh nhất
+            // Tạo mã OTP 6 số ngẫu nhiên
+            string otp = new Random().Next(100000, 999999).ToString();
+            user.ResetCode = otp;
+            user.ResetCodeExpiry = DateTime.UtcNow.AddMinutes(10); // Hết hạn sau 10 phút
             
             _context.SaveChanges();
 
             // Gửi Mail
-            string subject = "Khôi phục mật khẩu - Future Store";
+            string subject = otp + " là mã khôi phục mật khẩu của bạn";
             string body = $@"
-                <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
-                    <h2 style='color: #6366f1;'>Future Store - Khôi phục mật khẩu</h2>
+                <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px;'>
+                    <h2 style='color: #6366f1; text-align: center;'>Future Store</h2>
                     <p>Chào <b>{user.Name}</b>,</p>
-                    <p>Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu của bạn.</p>
-                    <p>Mật khẩu tạm thời của bạn là: <span style='font-size: 20px; font-weight: bold; color: #6366f1; background: #f3f4f6; padding: 5px 10px; border-radius: 5px;'>{tempPassword}</span></p>
-                    <p>Vui lòng đăng nhập bằng mật khẩu này và đổi lại mật khẩu ngay sau đó để bảo mật.</p>
+                    <p>Bạn đã yêu cầu khôi phục mật khẩu. Vui lòng sử dụng mã xác nhận dưới đây để tiếp tục:</p>
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <span style='font-size: 32px; font-weight: bold; color: #6366f1; letter-spacing: 5px; background: #f3f4f6; padding: 10px 20px; border-radius: 8px; border: 1px solid #e5e7eb;'>{otp}</span>
+                    </div>
+                    <p style='color: #ef4444; font-size: 0.9rem;'>* Mã này sẽ hết hạn sau 10 phút.</p>
+                    <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
                     <hr style='border: 0; border-top: 1px solid #eee;' />
-                    <p style='font-size: 12px; color: #999;'>Đây là email tự động, vui lòng không phản hồi.</p>
+                    <p style='font-size: 12px; color: #999; text-align: center;'>Đây là email tự động từ hệ thống Future Store.</p>
                 </div>";
 
             try {
                 await _emailService.SendEmailAsync(user.Email, subject, body);
-                return Ok(new { Message = "Mật khẩu mới đã được gửi vào Email của bạn!" });
+                return Ok(new { Message = "Mã xác nhận đã được gửi vào Email của bạn!" });
             } catch (Exception ex) {
                 return StatusCode(500, "Lỗi khi gửi Email: " + ex.Message);
             }
         }
+
+        // 🔑 2. XÁC NHẬN MÃ OTP VÀ ĐỔI MẬT KHẨU MỚI
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Code) || string.IsNullOrEmpty(request.NewPassword))
+                return BadRequest("Thông tin không đầy đủ");
+
+            var user = _context.Customers.FirstOrDefault(c => c.Email == request.Email);
+            if (user == null) return NotFound("Người dùng không tồn tại");
+
+            // Kiểm tra mã OTP
+            if (user.ResetCode != request.Code)
+                return BadRequest("Mã xác nhận không chính xác");
+
+            if (user.ResetCodeExpiry < DateTime.UtcNow)
+                return BadRequest("Mã xác nhận đã hết hạn");
+
+            // Cập nhật mật khẩu mới
+            user.Password = request.NewPassword;
+            user.ResetCode = null; // Xóa mã sau khi dùng xong
+            user.ResetCodeExpiry = null;
+            
+            _context.SaveChanges();
+
+            return Ok(new { Message = "Đổi mật khẩu thành công! Bạn có thể đăng nhập ngay." });
+        }
     }
 
-    // DTO dành riêng cho Login (chỉ cần Email + Password)
     public class CustomerLoginRequest
     {
         public string Email { get; set; } = string.Empty;
@@ -189,5 +219,12 @@ namespace ASP.NET.Controllers
     public class ForgotPasswordRequest
     {
         public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordRequest
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 }
