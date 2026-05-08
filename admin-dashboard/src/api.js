@@ -92,4 +92,9 @@ export const bannerApi = {
     delete: (id, adminName) => api.delete(`/Banners/${id}?adminName=${adminName || 'Admin'}`)
 };
 
+// Stats API
+export const statsApi = {
+    get: () => api.get('/Stats')
+};
+
 export default api;

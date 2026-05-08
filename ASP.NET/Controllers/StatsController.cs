@@ -25,7 +25,7 @@ namespace ASP.NET.Controllers
             public decimal TotalRevenue { get; set; }
             public int TodayOrders { get; set; }
             public object[] MonthlyRevenue { get; set; }
-            public object[] OrderStatus { get; set; }
+            public object[] OrderStatus { get; set; } = new object[0];
         }
 
         [HttpGet]
@@ -53,11 +53,8 @@ namespace ASP.NET.Controllers
                     .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m
             }));
 
-            // Order status breakdown
-            var statusGroups = await _context.Orders
-                .GroupBy(o => o.Status)
-                .Select(g => new { status = g.Key, count = g.Count() })
-                .ToListAsync();
+            // Order status breakdown (DISABLED: Order model does not have Status property)
+            var statusGroups = new object[0];
 
             var dto = new StatsDto
             {

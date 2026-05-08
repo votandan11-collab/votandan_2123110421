@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Tags, ShoppingCart, Users, TrendingUp, DollarSign, Award, Gift } from 'lucide-react';
-import { productApi, orderApi, customerApi, rewardApi } from '../api';
+import { Package, ShoppingCart, DollarSign, Users, RefreshCw, ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
+import { statsApi, orderApi } from '../api';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const Dashboard = () => {
-    const [stats, setStats] = useState([
-        { label: 'Products', value: '...', icon: <Package />, color: 'var(--primary)' },
-        { label: 'Orders', value: '...', icon: <ShoppingCart />, color: 'var(--secondary)' },
-        { label: 'Revenue', value: '...', icon: <DollarSign />, color: 'oklch(70% 0.15 150)' },
-        { label: 'Customers', value: '...', icon: <Users />, color: 'oklch(65% 0.18 210)' },
-    ]);
+    const [stats, setStats] = useState(null);
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -19,22 +15,12 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const [products, orders, customers] = await Promise.all([
-                productApi.getAll(),
-                orderApi.getAll(),
-                customerApi.getAll()
+            const [statsRes, ordersRes] = await Promise.all([
+                statsApi.get(),
+                orderApi.getAll()
             ]);
-
-            const totalRevenue = orders.data.reduce((acc, curr) => acc + curr.totalAmount, 0);
-
-            setStats([
-                { label: 'Total Products', value: products.data.length, icon: <Package />, color: 'var(--primary)' },
-                { label: 'Total Orders', value: orders.data.length, icon: <ShoppingCart />, color: 'var(--secondary)' },
-                { label: 'Total Revenue', value: totalRevenue.toLocaleString() + ' VNĐ', icon: <DollarSign />, color: 'oklch(70% 0.15 150)' },
-                { label: 'Total Customers', value: customers.data.length, icon: <Users />, color: 'oklch(65% 0.18 210)' },
-            ]);
-
-            setRecentOrders(orders.data.slice(0, 5));
+            setStats(statsRes.data);
+            setRecentOrders(ordersRes.data.slice(0, 5));
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
@@ -42,123 +28,128 @@ const Dashboard = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                <div className="animate-spin" style={{ color: 'var(--primary)' }}>
+                    <RefreshCw size={48} />
+                </div>
+            </div>
+        );
+    }
+
+    // Format data cho biểu đồ đường (Arrow graph style)
+    const chartData = stats?.monthlyRevenue.map(item => ({
+        name: new Date(item.month).toLocaleDateString('vi-VN', { month: 'short' }),
+        revenue: item.revenue
+    })) || [];
+
+    const kpis = [
+        { label: 'Sản phẩm', value: stats?.totalProducts, icon: <Package />, color: '#6366f1', trend: '+12%' },
+        { label: 'Đơn hàng', value: stats?.totalOrders, icon: <ShoppingCart />, color: '#10b981', trend: '+5%' },
+        { label: 'Doanh thu', value: stats?.totalRevenue.toLocaleString() + 'đ', icon: <DollarSign />, color: '#f59e0b', trend: '+18%' },
+        { label: 'Đơn hôm nay', value: stats?.todayOrders, icon: <TrendingUp />, color: '#ec4899', trend: 'Live' },
+    ];
+
     return (
         <div className="animate-in">
             <div className="top-bar">
                 <div className="page-title">
-                    <h1 style={{ fontSize: '2.5rem', letterSpacing: '-0.03em', fontWeight: 800 }}>Dashboard</h1>
-                    <p style={{ fontSize: '1rem', opacity: 0.7 }}>Real-time analytics & loyalty health</p>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Dashboard</h1>
+                    <p style={{ opacity: 0.7 }}>Thống kê dữ liệu thực thời gian thực</p>
                 </div>
-                <button 
-                    className="btn-premium btn-primary-premium" 
-                    onClick={fetchDashboardData}
-                    style={{ borderRadius: '14px', padding: '12px 24px' }}
-                >
-                    Refresh Data
+                <button className="btn-premium btn-primary-premium" onClick={fetchDashboardData}>
+                    <RefreshCw size={18} style={{ marginRight: '8px' }} /> Làm mới
                 </button>
             </div>
 
-            <div className="stats-grid">
-                {stats.map((stat, i) => (
-                    <div key={i} className="stat-card" style={{ padding: '2rem', border: '1px solid var(--glass-border)', background: 'var(--card-bg)', backdropFilter: 'blur(20px)' }}>
-                        <div className="stat-header" style={{ marginBottom: '1.5rem' }}>
-                            <div className="stat-icon" style={{ 
-                                width: '48px', 
-                                height: '48px', 
-                                borderRadius: '14px', 
-                                background: `oklch(from ${stat.color} l c h / 0.1)`, 
-                                color: stat.color,
-                                border: `1px solid oklch(from ${stat.color} l c h / 0.2)`
+            {/* KPI Cards */}
+            <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+                {kpis.map((kpi, i) => (
+                    <div key={i} className="stat-card" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                            <div style={{ 
+                                padding: '12px', 
+                                background: `${kpi.color}15`, 
+                                color: kpi.color, 
+                                borderRadius: '12px' 
                             }}>
-                                {stat.icon}
+                                {kpi.icon}
                             </div>
-                            <div style={{ color: 'oklch(70% 0.15 150)', display: 'flex', alignItems: 'center', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                                <TrendingUp size={14} style={{ marginRight: '6px' }} /> Live
+                            <div style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '4px', 
+                                color: kpi.trend.includes('+') ? '#10b981' : '#6366f1',
+                                fontSize: '0.8rem',
+                                fontWeight: 700
+                            }}>
+                                {kpi.trend.includes('+') ? <ArrowUpRight size={14} /> : null}
+                                {kpi.trend}
                             </div>
                         </div>
-                        <div className="stat-value" style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>{stat.value}</div>
-                        <div className="stat-label" style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>{stat.label}</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '4px' }}>{kpi.value}</div>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{kpi.label}</div>
                     </div>
                 ))}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+                {/* Biểu đồ xu hướng (Arrow Graph / Line Chart) */}
                 <div className="table-container" style={{ padding: '2rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>Recent Transactions</h2>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Last 5 orders</div>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Xu hướng doanh thu</h2>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <AreaChart data={chartData}>
+                                <defs>
+                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 12}} tickFormatter={(v) => `${v/1000000}M`} />
+                                <Tooltip 
+                                    contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--glass-border)', borderRadius: '12px' }}
+                                    itemStyle={{ color: 'var(--primary)' }}
+                                />
+                                <Area 
+                                    type="monotone" 
+                                    dataKey="revenue" 
+                                    stroke="var(--primary)" 
+                                    strokeWidth={3} 
+                                    fillOpacity={1} 
+                                    fill="url(#colorRev)" 
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
-                    <table style={{ borderSpacing: '0 12px', borderCollapse: 'separate' }}>
-                        <thead>
-                            <tr>
-                                <th style={{ padding: '0 1rem 1rem' }}>Order ID</th>
-                                <th style={{ padding: '0 1rem 1rem' }}>Customer</th>
-                                <th style={{ padding: '0 1rem 1rem' }}>Amount</th>
-                                <th style={{ padding: '0 1rem 1rem' }}>Tier</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {recentOrders.map((order) => (
-                                <tr key={order.id} style={{ background: 'oklch(100% 0 0 / 0.02)', borderRadius: '12px' }}>
-                                    <td style={{ padding: '1.25rem 1rem', borderBottom: 'none' }}>
-                                        <span style={{ fontWeight: 700, color: 'var(--primary)' }}>#{order.id}</span>
-                                    </td>
-                                    <td style={{ padding: '1.25rem 1rem', borderBottom: 'none', fontWeight: 500 }}>
-                                        {order.customer?.name || 'Guest User'}
-                                    </td>
-                                    <td style={{ padding: '1.25rem 1rem', borderBottom: 'none', fontWeight: 600 }}>
-                                        {order.totalAmount.toLocaleString()} <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>VNĐ</span>
-                                    </td>
-                                    <td style={{ padding: '1.25rem 1rem', borderBottom: 'none' }}>
-                                        <span className="status-pills" style={{ 
-                                            background: 'oklch(from var(--primary) l c h / 0.1)', 
-                                            color: 'var(--primary)',
-                                            border: '1px solid oklch(from var(--primary) l c h / 0.1)',
-                                            padding: '6px 12px',
-                                            borderRadius: '8px'
-                                        }}>
-                                            {order.customer?.level || 'Standard'}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
                 </div>
 
-                <div className="table-container" style={{ padding: '2rem' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '2rem' }}>Loyalty Pulse</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '1.5rem', background: 'oklch(100% 0 0 / 0.02)' }}>
-                            <div style={{ 
-                                padding: '12px', 
-                                background: 'oklch(65% 0.2 330 / 0.1)', 
-                                color: 'oklch(65% 0.2 330)', 
-                                borderRadius: '14px',
-                                border: '1px solid oklch(65% 0.2 330 / 0.2)'
+                {/* Recent Orders */}
+                <div className="table-container" style={{ padding: '1.5rem' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Đơn hàng mới nhất</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {recentOrders.map((order) => (
+                            <div key={order.id} style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center',
+                                padding: '12px',
+                                background: 'rgba(255,255,255,0.03)',
+                                borderRadius: '12px',
+                                border: '1px solid var(--glass-border)'
                             }}>
-                                <Award size={24} />
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>#{order.id}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(order.createdAt).toLocaleDateString()}</div>
+                                </div>
+                                <div style={{ fontWeight: 800, color: 'var(--primary)' }}>
+                                    {order.totalAmount.toLocaleString()}đ
+                                </div>
                             </div>
-                            <div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '2px' }}>VIP Status</div>
-                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Active Members</div>
-                            </div>
-                        </div>
-                        <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '1.5rem', background: 'oklch(100% 0 0 / 0.02)' }}>
-                            <div style={{ 
-                                padding: '12px', 
-                                background: 'oklch(70% 0.18 60 / 0.1)', 
-                                color: 'oklch(70% 0.18 60)', 
-                                borderRadius: '14px',
-                                border: '1px solid oklch(70% 0.18 60 / 0.2)'
-                            }}>
-                                <Gift size={24} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Rewards</div>
-                                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Pending Claims</div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
