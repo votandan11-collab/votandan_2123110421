@@ -9,10 +9,12 @@ namespace ASP.NET.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ASP.NET.Services.IEmailService _emailService;
 
-        public CustomersController(AppDbContext context)
+        public CustomersController(AppDbContext context, ASP.NET.Services.IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // 🔍 GET ALL
@@ -137,6 +139,44 @@ namespace ASP.NET.Controllers
                 Token = "fake-jwt-" + user.Id + "-" + Guid.NewGuid().ToString().Substring(0, 8)
             });
         }
+        
+        // 🔑 FORGOT PASSWORD
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email))
+                return BadRequest("Vui lòng nhập Email");
+
+            var user = _context.Customers.FirstOrDefault(c => c.Email == request.Email);
+            if (user == null) 
+                return NotFound("Email không tồn tại trong hệ thống");
+
+            // Tạo mật khẩu tạm thời ngẫu nhiên (6 ký tự)
+            string tempPassword = Guid.NewGuid().ToString().Substring(0, 6).ToUpper();
+            user.Password = tempPassword; // Trong thực tế nên dùng Token và Reset Link, nhưng đây là cách nhanh nhất
+            
+            _context.SaveChanges();
+
+            // Gửi Mail
+            string subject = "Khôi phục mật khẩu - Future Store";
+            string body = $@"
+                <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+                    <h2 style='color: #6366f1;'>Future Store - Khôi phục mật khẩu</h2>
+                    <p>Chào <b>{user.Name}</b>,</p>
+                    <p>Chúng tôi đã nhận được yêu cầu khôi phục mật khẩu của bạn.</p>
+                    <p>Mật khẩu tạm thời của bạn là: <span style='font-size: 20px; font-weight: bold; color: #6366f1; background: #f3f4f6; padding: 5px 10px; border-radius: 5px;'>{tempPassword}</span></p>
+                    <p>Vui lòng đăng nhập bằng mật khẩu này và đổi lại mật khẩu ngay sau đó để bảo mật.</p>
+                    <hr style='border: 0; border-top: 1px solid #eee;' />
+                    <p style='font-size: 12px; color: #999;'>Đây là email tự động, vui lòng không phản hồi.</p>
+                </div>";
+
+            try {
+                await _emailService.SendEmailAsync(user.Email, subject, body);
+                return Ok(new { Message = "Mật khẩu mới đã được gửi vào Email của bạn!" });
+            } catch (Exception ex) {
+                return StatusCode(500, "Lỗi khi gửi Email: " + ex.Message);
+            }
+        }
     }
 
     // DTO dành riêng cho Login (chỉ cần Email + Password)
@@ -144,5 +184,10 @@ namespace ASP.NET.Controllers
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class ForgotPasswordRequest
+    {
+        public string Email { get; set; } = string.Empty;
     }
 }

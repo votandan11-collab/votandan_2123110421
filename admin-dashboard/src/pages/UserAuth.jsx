@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Mail, ArrowRight, Loader2, UserPlus } from 'lucide-react';
+import { User, Lock, Mail, ArrowRight, Loader2, UserPlus, KeyRound } from 'lucide-react';
 import { customerApi } from '../api';
 
 const UserAuth = () => {
-    const [isLogin, setIsLogin] = useState(true);
+    const [mode, setMode] = useState('login'); // 'login', 'register', 'forgot'
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -12,6 +12,7 @@ const UserAuth = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -21,35 +22,36 @@ const UserAuth = () => {
     const handleAuth = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccess('');
         setLoading(true);
 
         try {
-            if (isLogin) {
-                // For simplicity, we search the customer list for match
-                // In production, use a proper Auth endpoint
-                const customers = await customerApi.getAll();
-                const user = customers.data.find(c => c.email === formData.email && c.password === formData.password);
+            if (mode === 'login') {
+                const response = await customerApi.login({
+                    email: formData.email,
+                    password: formData.password
+                });
                 
-                if (user) {
-                    localStorage.setItem('userToken', 'user-token-' + user.id);
-                    localStorage.setItem('userData', JSON.stringify(user));
-                    navigate('/');
-                } else {
-                    setError('Invalid email or password');
-                }
-            } else {
-                // Register
-                const response = await customerApi.create({
+                localStorage.setItem('userToken', response.data.token);
+                localStorage.setItem('userData', JSON.stringify(response.data));
+                navigate('/');
+            } else if (mode === 'register') {
+                const response = await customerApi.register({
                     name: formData.name,
                     email: formData.email,
                     password: formData.password
                 });
-                localStorage.setItem('userToken', 'user-token-' + response.data.id);
-                localStorage.setItem('userData', JSON.stringify(response.data));
+                
+                localStorage.setItem('userToken', response.data.user.token || 'fake-token');
+                localStorage.setItem('userData', JSON.stringify(response.data.user));
                 navigate('/');
+            } else if (mode === 'forgot') {
+                const response = await customerApi.forgotPassword({ email: formData.email });
+                setSuccess(response.data.message);
+                setMode('login'); // Quay lại trang login sau khi gửi mail
             }
         } catch (err) {
-            setError('Something went wrong. Please try again.');
+            setError(err.response?.data || 'Có lỗi xảy ra. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -75,39 +77,56 @@ const UserAuth = () => {
                 color: 'white'
             }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h1 style={{ fontSize: '1.75rem', fontWeight: 700 }}>{isLogin ? 'Customer Login' : 'Create Account'}</h1>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 700 }}>
+                        {mode === 'login' ? 'Đăng Nhập' : mode === 'register' ? 'Tạo Tài Khoản' : 'Khôi Phục Mật Khẩu'}
+                    </h1>
                     <p style={{ color: '#94a3b8', marginTop: '0.5rem' }}>
-                        {isLogin ? 'Welcome back! Manage your points.' : 'Join the loyalty program today.'}
+                        {mode === 'login' ? 'Chào mừng bạn quay lại!' : mode === 'register' ? 'Tham gia chương trình khách hàng thân thiết.' : 'Nhập email để nhận mật mã mới.'}
                     </p>
                 </div>
 
                 <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {!isLogin && (
+                    {mode === 'register' && (
                         <div style={{ position: 'relative' }}>
                             <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                             <input 
-                                type="text" name="name" placeholder="Full Name" 
+                                type="text" name="name" placeholder="Họ và Tên" 
                                 className="input-field" style={{ paddingLeft: '40px' }}
                                 value={formData.name} onChange={handleChange} required
                             />
                         </div>
                     )}
+                    
                     <div style={{ position: 'relative' }}>
                         <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                         <input 
-                            type="email" name="email" placeholder="Email Address" 
+                            type="email" name="email" placeholder="Địa chỉ Email" 
                             className="input-field" style={{ paddingLeft: '40px' }}
                             value={formData.email} onChange={handleChange} required
                         />
                     </div>
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                        <input 
-                            type="password" name="password" placeholder="Password" 
-                            className="input-field" style={{ paddingLeft: '40px' }}
-                            value={formData.password} onChange={handleChange} required
-                        />
-                    </div>
+
+                    {mode !== 'forgot' && (
+                        <div style={{ position: 'relative' }}>
+                            <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                            <input 
+                                type="password" name="password" placeholder="Mật khẩu" 
+                                className="input-field" style={{ paddingLeft: '40px' }}
+                                value={formData.password} onChange={handleChange} required
+                            />
+                        </div>
+                    )}
+
+                    {mode === 'login' && (
+                        <div style={{ textAlign: 'right' }}>
+                            <span 
+                                onClick={() => setMode('forgot')}
+                                style={{ fontSize: '0.8rem', color: '#6366f1', cursor: 'pointer' }}
+                            >
+                                Quên mật khẩu?
+                            </span>
+                        </div>
+                    )}
 
                     {error && (
                         <div style={{ color: '#ef4444', fontSize: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '8px' }}>
@@ -115,17 +134,23 @@ const UserAuth = () => {
                         </div>
                     )}
 
+                    {success && (
+                        <div style={{ color: '#10b981', fontSize: '0.8rem', background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '8px' }}>
+                            {success}
+                        </div>
+                    )}
+
                     <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={loading}>
-                        {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Register')}
+                        {loading ? 'Đang xử lý...' : (mode === 'login' ? 'Đăng Nhập' : mode === 'register' ? 'Đăng Ký' : 'Gửi Yêu Cầu')}
                     </button>
                     
                     <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#94a3b8' }}>
-                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                        {mode === 'login' ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
                         <span 
-                            onClick={() => setIsLogin(!isLogin)} 
+                            onClick={() => setMode(mode === 'login' ? 'register' : 'login')} 
                             style={{ color: '#6366f1', cursor: 'pointer', fontWeight: 600 }}
                         >
-                            {isLogin ? 'Register' : 'Login'}
+                            {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập'}
                         </span>
                     </p>
                 </form>

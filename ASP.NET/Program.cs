@@ -42,6 +42,7 @@ if (!string.IsNullOrEmpty(connectionString)) {
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<ASP.NET.Services.IEmailService, ASP.NET.Services.EmailService>();
 
 builder.Services.AddCors(options =>
 {

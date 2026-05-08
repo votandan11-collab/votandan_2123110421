@@ -36,6 +36,7 @@ export const customerApi = {
   delete: (id, adminName) => api.delete(`/Customers/${id}?adminName=${adminName || 'Admin'}`),
   login: (data) => api.post('/Customers/login', data),
   register: (data) => api.post('/Customers/register', data),
+  forgotPassword: (data) => api.post('/Customers/forgot-password', data),
 };
 
 export const orderApi = {
