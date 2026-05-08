@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace ASP.NET.Controllers
                 month = m.Month.ToString("yyyy-MM"),
                 revenue = await _context.Orders
                     .Where(o => o.CreatedAt >= m.Month && o.CreatedAt < m.Month.AddMonths(1))
-                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m
             }));
 
             // Order status breakdown
