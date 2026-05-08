@@ -53,6 +53,10 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Đặt CORS ở đây để nó luôn chạy trước mọi thứ khác
+app.UseCors("AllowAll");
+
 app.UseDeveloperExceptionPage();
 
 // 🔥 TỰ ĐỘNG MIGRATION KHI STARTUP 🔥
@@ -115,7 +119,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseCors("AllowAll");
 // Cấu hình Middleware
 app.UseSwagger();
 app.UseSwaggerUI(c =>
