@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ASP.NET.Data;
 using ASP.NET.Models;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace ASP.NET.Controllers
 {
@@ -67,6 +69,66 @@ namespace ASP.NET.Controllers
             };
 
             return Ok(dto);
+        }
+
+        // 📊 XUẤT EXCEL DOANH THU THÁNG
+        [HttpGet("export-revenue")]
+        public IActionResult ExportRevenue([FromQuery] int month, [FromQuery] int year)
+        {
+            var orders = _context.Orders
+                .Where(o => o.CreatedAt.Month == month && o.CreatedAt.Year == year)
+                .ToList();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Doanh Thu");
+                
+                // Tiêu đề
+                worksheet.Cell(1, 1).Value = $"BÁO CÁO DOANH THU THÁNG {month}/{year}";
+                worksheet.Cell(1, 1).Style.Font.Bold = true;
+                worksheet.Cell(1, 1).Style.Font.FontSize = 16;
+                worksheet.Range(1, 1, 1, 4).Merge();
+
+                // Header bảng
+                var headers = new string[] { "Mã Đơn", "Ngày Tạo", "Khách Hàng (ID)", "Tổng Tiền (VNĐ)" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    var cell = worksheet.Cell(3, i + 1);
+                    cell.Value = headers[i];
+                    cell.Style.Fill.BackgroundColor = XLColor.LightBlue;
+                    cell.Style.Font.Bold = true;
+                }
+
+                // Dữ liệu
+                int row = 4;
+                decimal total = 0;
+                foreach (var order in orders)
+                {
+                    worksheet.Cell(row, 1).Value = order.Id;
+                    worksheet.Cell(row, 2).Value = order.CreatedAt.ToString("dd/MM/yyyy HH:mm");
+                    worksheet.Cell(row, 3).Value = order.CustomerId;
+                    worksheet.Cell(row, 4).Value = order.TotalAmount;
+                    
+                    total += order.TotalAmount;
+                    row++;
+                }
+
+                // Tổng cộng
+                worksheet.Cell(row + 1, 3).Value = "TỔNG CỘNG:";
+                worksheet.Cell(row + 1, 3).Style.Font.Bold = true;
+                worksheet.Cell(row + 1, 4).Value = total;
+                worksheet.Cell(row + 1, 4).Style.Font.Bold = true;
+                worksheet.Cell(row + 1, 4).Style.Font.FontColor = XLColor.Red;
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"DoanhThu_{month}_{year}.xlsx");
+                }
+            }
         }
     }
 }

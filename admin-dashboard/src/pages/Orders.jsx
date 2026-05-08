@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Filter, Eye, Calendar, User, DollarSign, Clock } from 'lucide-react';
+import { ShoppingCart, Search, Filter, Eye, Calendar, User, DollarSign, Clock, Printer } from 'lucide-react';
 import { orderApi } from '../api';
 
 const Orders = () => {
@@ -31,6 +30,64 @@ const Orders = () => {
             hour: '2-digit',
             minute: '2-digit'
         });
+    };
+
+    const handlePrintInvoice = (order) => {
+        const printWindow = window.open('', '_blank');
+        const invoiceHTML = `
+            <html>
+                <head>
+                    <title>Hóa Đơn #${order.id}</title>
+                    <style>
+                        body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; }
+                        .header { text-align: center; border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 30px; }
+                        .logo { font-size: 24px; font-weight: bold; color: #6366f1; }
+                        .info { display: flex; justify-content: space-between; margin-bottom: 40px; }
+                        .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+                        .table th, .table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+                        .total { text-align: right; font-size: 20px; font-weight: bold; color: #6366f1; }
+                        .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #999; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">CARD STORE</div>
+                        <p>HÓA ĐƠN THANH TOÁN</p>
+                    </div>
+                    <div class="info">
+                        <div>
+                            <p><strong>Khách hàng:</strong> ${order.customer?.name || 'Khách vãng lai'}</p>
+                            <p><strong>Email:</strong> ${order.customer?.email || 'N/A'}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p><strong>Mã đơn hàng:</strong> #${order.id}</p>
+                            <p><strong>Ngày:</strong> ${formatDate(order.createdAt)}</p>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Mô tả</th>
+                                <th>Số lượng</th>
+                                <th style="text-align: right;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Giao dịch nạp thẻ / Mua thẻ</td>
+                                <td>1</td>
+                                <td style="text-align: right;">${order.totalAmount.toLocaleString()} VNĐ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="total">TỔNG CỘNG: ${order.totalAmount.toLocaleString()} VNĐ</div>
+                    <div class="footer">Cảm ơn quý khách đã tin dùng dịch vụ của Card Store!</div>
+                    <script>window.print();</script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(invoiceHTML);
+        printWindow.document.close();
     };
 
     const filteredOrders = orders.filter(o => 
@@ -122,9 +179,18 @@ const Orders = () => {
                                         </div>
                                     </td>
                                     <td>
-                                        <button className="btn" style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
-                                            <Eye size={16} />
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button className="btn" style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                                                <Eye size={16} />
+                                            </button>
+                                            <button 
+                                                className="btn" 
+                                                style={{ padding: '6px', background: 'rgba(99, 102, 241, 0.15)', color: '#6366f1' }}
+                                                onClick={() => handlePrintInvoice(order)}
+                                            >
+                                                <Printer size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Package, ShoppingCart, DollarSign, Users, RefreshCw, ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
-import { statsApi, orderApi } from '../api';
+import { Package, ShoppingCart, DollarSign, Users, RefreshCw, ArrowUpRight, ArrowDownRight, TrendingUp, Download } from 'lucide-react';
+import { statsApi, orderApi, API_BASE_URL } from '../api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 const Dashboard = () => {
@@ -26,6 +25,14 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleExportExcel = () => {
+        const now = new Date();
+        const month = now.getMonth() + 1;
+        const year = now.getFullYear();
+        // Mở URL export trong tab mới để trình duyệt tự tải về
+        window.open(`${API_BASE_URL}/Stats/export-revenue?month=${month}&year=${year}`, '_blank');
     };
 
     if (loading) {
@@ -58,9 +65,14 @@ const Dashboard = () => {
                     <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Dashboard</h1>
                     <p style={{ opacity: 0.7 }}>Thống kê dữ liệu thực thời gian thực</p>
                 </div>
-                <button className="btn-premium btn-primary-premium" onClick={fetchDashboardData}>
-                    <RefreshCw size={18} style={{ marginRight: '8px' }} /> Làm mới
-                </button>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button className="btn-premium" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }} onClick={handleExportExcel}>
+                        <Download size={18} style={{ marginRight: '8px' }} /> Xuất Excel
+                    </button>
+                    <button className="btn-premium btn-primary-premium" onClick={fetchDashboardData}>
+                        <RefreshCw size={18} style={{ marginRight: '8px' }} /> Làm mới
+                    </button>
+                </div>
             </div>
 
             {/* KPI Cards */}
