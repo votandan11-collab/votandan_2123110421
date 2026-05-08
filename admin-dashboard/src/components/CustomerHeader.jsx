@@ -55,7 +55,7 @@ const CustomerHeader = ({ user, handleLogout }) => {
           }}>
             <Wallet color="white" size={20} />
           </div>
-          <span style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>FUTURE STORE</span>
+          <span style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>CARD STORE</span>
         </Link>
 
         {/* NAVIGATION */}

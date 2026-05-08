@@ -162,7 +162,7 @@ namespace ASP.NET.Controllers
             string subject = otp + " là mã khôi phục mật khẩu của bạn";
             string body = $@"
                 <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px;'>
-                    <h2 style='color: #6366f1; text-align: center;'>Future Store</h2>
+                    <h2 style='color: #6366f1; text-align: center;'>Card Store</h2>
                     <p>Chào <b>{user.Name}</b>,</p>
                     <p>Bạn đã yêu cầu khôi phục mật khẩu. Vui lòng sử dụng mã xác nhận dưới đây để tiếp tục:</p>
                     <div style='text-align: center; margin: 30px 0;'>
@@ -171,7 +171,7 @@ namespace ASP.NET.Controllers
                     <p style='color: #ef4444; font-size: 0.9rem;'>* Mã này sẽ hết hạn sau 10 phút.</p>
                     <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
                     <hr style='border: 0; border-top: 1px solid #eee;' />
-                    <p style='font-size: 12px; color: #999; text-align: center;'>Đây là email tự động từ hệ thống Future Store.</p>
+                    <p style='font-size: 12px; color: #999; text-align: center;'>Đây là email tự động từ hệ thống Card Store.</p>
                 </div>";
 
             try {

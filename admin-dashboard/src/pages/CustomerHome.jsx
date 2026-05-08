@@ -67,7 +67,7 @@ const CustomerHome = () => {
                 Evolutionary Card Topup
             </div>
             <h1 className="hero-title">
-                {banners[currentSlide]?.title || 'The Future of Digital Topups'}
+                {banners[currentSlide]?.title || 'Card Store - Digital Topups'}
             </h1>
             <p className="hero-description">
                 {banners[currentSlide]?.description || 'Experience the next generation of card top-ups with exclusive VIP rewards and market-leading discounts.'}

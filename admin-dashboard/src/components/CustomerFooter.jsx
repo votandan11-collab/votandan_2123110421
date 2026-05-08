@@ -64,7 +64,7 @@ const CustomerFooter = () => {
         borderTop: '1px solid rgba(255, 255, 255, 0.05)', textAlign: 'center',
         color: '#64748b', fontSize: '0.85rem'
       }}>
-        © 2026 Card Loyalty System. All rights reserved. Designed for Future Store.
+        © 2026 Card Loyalty System. All rights reserved. Designed for Card Store.
       </div>
     </footer>
   );
