@@ -44,7 +44,13 @@ const CustomerLogin = () => {
       }
     } catch (err) {
       const errData = err.response?.data;
-      setError(typeof errData === 'string' ? errData : 'Có lỗi xảy ra. Hãy thử lại.');
+      if (typeof errData === 'string') {
+        setError(errData);
+      } else if (errData && typeof errData === 'object' && errData.Message) {
+        setError(errData.Message);
+      } else {
+        setError('Có lỗi xảy ra. Hãy thử lại.');
+      }
     } finally {
       setLoading(false);
     }
