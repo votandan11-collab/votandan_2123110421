@@ -111,6 +111,12 @@ using (var scope = app.Services.CreateScope())
             context.Database.ExecuteSqlRaw("ALTER TABLE \"Rewards\" ADD COLUMN IF NOT EXISTS \"StockQuantity\" INTEGER DEFAULT 0;");
         } catch { /* Bỏ qua */ }
 
+        // 5. Cập nhật các cột thiếu cho Customers (OTP Quên mật khẩu)
+        try {
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Customers\" ADD COLUMN IF NOT EXISTS \"ResetCode\" TEXT;");
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Customers\" ADD COLUMN IF NOT EXISTS \"ResetCodeExpiry\" TIMESTAMP WITH TIME ZONE;");
+        } catch { /* Bỏ qua */ }
+
         Console.WriteLine("--- DATABASE: Khởi tạo hoàn tất ---");
     }
     catch (Exception ex)
