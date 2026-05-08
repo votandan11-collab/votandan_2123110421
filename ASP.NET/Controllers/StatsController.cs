@@ -21,7 +21,7 @@ namespace ASP.NET.Controllers
         {
             public int TotalProducts { get; set; }
             public int TotalOrders { get; set; }
-            public long TotalRevenue { get; set; }
+            public decimal TotalRevenue { get; set; }
             public int TodayOrders { get; set; }
             public object[] MonthlyRevenue { get; set; }
             public object[] OrderStatus { get; set; }
@@ -49,7 +49,7 @@ namespace ASP.NET.Controllers
                 month = m.Month.ToString("yyyy-MM"),
                 revenue = await _context.Orders
                     .Where(o => o.CreatedAt >= m.Month && o.CreatedAt < m.Month.AddMonths(1))
-                    .SumAsync(o => (long?)o.TotalAmount) ?? 0
+                    .SumAsync(o => (decimal?)o.TotalAmount) ?? 0
             }));
 
             // Order status breakdown
